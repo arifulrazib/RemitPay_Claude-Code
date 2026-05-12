@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>/* auth guard — redirect before rendering if not signed in */(function(){var k='remitpay.auth';if(!(localStorage.getItem(k)||sessionStorage.getItem(k)))location.replace('login.html');})();</script>
+<title>Send Money — RemitPay</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-primary: #00A86B;
+    --brand-primary-pressed: #008454;
+    --brand-secondary: #2F80ED;
+    --brand-accent: #00C474;
+    --success-base: #00A371;
+    --success-bg: #E6F7F1;
+    --warning-base: #E89B00;
+    --warning-bg: #FFF6E5;
+    --error-base: #D7263D;
+    --text-primary: #0A2540;
+    --text-secondary: #6B8299;
+    --text-muted: #9AAEC1;
+    --surface-page: #F4F8FC;
+    --surface-card: #FFFFFF;
+    --surface-raised: #FAFCFE;
+    --border-subtle: #E5EDF5;
+    --border-strong: #C3D2E0;
+    --elev-1: 0 1px 2px rgba(10,37,64,0.06);
+    --elev-2: 0 4px 12px rgba(10,37,64,0.08);
+    --elev-3: 0 12px 32px rgba(10,37,64,0.14);
+    --ease-std: cubic-bezier(0.2, 0, 0, 1);
+    --dur-fast: 160ms;
+    --dur-base: 240ms;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Poppins', system-ui, sans-serif;
+    background: var(--surface-page);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    font-size: 14px;
+  }
+  button, input { font-family: inherit; }
+  a { color: var(--brand-primary); text-decoration: none; }
+
+  /* ============ TOPBAR ============ */
+  .topbar {
+    height: 72px; background: var(--surface-card);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 20;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: inherit;
+    transition: opacity var(--dur-fast) var(--ease-std);
+  }
+  .logo:hover { opacity: 0.85; }
+  .logo:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 4px; border-radius: 4px; }
+  .logo-mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-family: 'Poppins'; font-weight: 800; font-size: 16px;
+  }
+  .logo-text {
+    font-family: 'Poppins'; font-weight: 800; font-size: 18px;
+    color: var(--text-primary); letter-spacing: -0.3px;
+  }
+  .logo-text span { color: var(--brand-accent); }
+  .topbar-help {
+    display: flex; align-items: center; gap: 16px;
+  }
+  .secure-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--text-secondary); font-size: 12px; font-weight: 500;
+  }
+  .secure-tag svg { color: var(--success-base); }
+  .close-btn {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: transparent; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    transition: background var(--dur-fast) var(--ease-std);
+    text-decoration: none;
+  }
+  .close-btn:hover { background: var(--surface-page); color: var(--text-primary); }
+  .logout-btn {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: transparent; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    transition: background var(--dur-fast) var(--ease-std), color var(--dur-fast) var(--ease-std);
+  }
+  .logout-btn:hover { background: var(--error-bg, #FCE8EB); color: var(--error-base); }
+
+  /* ============ LANGUAGE SWITCHER ============ */
+  .lang-switcher { position: relative; }
+  .lang-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px; border-radius: 8px;
+    background: transparent; border: 1px solid var(--border-subtle);
+    color: var(--text-secondary); font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-std), border-color var(--dur-fast) var(--ease-std);
+  }
+  .lang-btn:hover { background: var(--surface-page); border-color: var(--border-strong); }
+  .lang-switcher.open .lang-btn { border-color: var(--brand-primary); color: var(--brand-primary); }
+  .lang-btn .chev { transition: transform var(--dur-fast) var(--ease-std); }
+  .lang-switcher.open .lang-btn .chev { transform: rotate(180deg); }
+  .lang-menu {
+    position: absolute; top: calc(100% + 6px); right: 0;
+    min-width: 180px; padding: 6px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    box-shadow: var(--elev-3);
+    list-style: none; margin: 0; z-index: 30;
+    opacity: 0; transform: translateY(-4px); pointer-events: none;
+    transition: opacity var(--dur-fast) var(--ease-std), transform var(--dur-fast) var(--ease-std);
+  }
+  .lang-switcher.open .lang-menu { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .lang-menu li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text-primary);
+    cursor: pointer; -webkit-user-select: none; user-select: none;
+    transition: background var(--dur-fast) var(--ease-std);
+  }
+  .lang-menu li:hover { background: var(--surface-page); }
+  .lang-menu li.active { color: var(--brand-primary); font-weight: 600; }
+  .lang-menu .lang-code {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.4px;
+    background: var(--surface-page); color: var(--text-secondary);
+    padding: 3px 7px; border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .lang-menu li.active .lang-code { background: var(--brand-primary); color: #fff; }
+  .lang-menu .check {
+    margin-left: auto; opacity: 0; color: var(--brand-primary);
+    transition: opacity var(--dur-fast) var(--ease-std);
+  }
+  .lang-menu li.active .check { opacity: 1; }
+  html[lang="bn"] body { font-family: 'Noto Sans Bengali', 'Poppins', system-ui, sans-serif; }
+
+  /* ============ STEPPER ============ */
+  .stepper-wrap {
+    background: transparent;
+    padding: 24px 32px;
+  }
+  .stepper {
+    max-width: 720px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative;
+  }
+  .stepper::before {
+    content: ''; position: absolute; left: 24px; right: 24px; top: 16px;
+    height: 2px; background: var(--border-subtle); z-index: 0;
+  }
+  .stepper::after {
+    content: ''; position: absolute; left: 24px; top: 16px; height: 2px;
+    background: linear-gradient(90deg, var(--brand-primary), var(--brand-accent));
+    transition: width var(--dur-base) var(--ease-std);
+    z-index: 1;
+  }
+  body[data-step="1"] .stepper::after { width: 0; }
+  body[data-step="2"] .stepper::after { width: calc(33.33% - 16px); }
+  body[data-step="3"] .stepper::after { width: calc(66.66% - 16px); }
+  body[data-step="4"] .stepper::after,
+  body[data-step="5"] .stepper::after,
+  body[data-step="6"] .stepper::after { width: calc(100% - 48px); }
+
+  .step-node {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    position: relative; z-index: 2;
+  }
+  .step-circle {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--surface-card); border: 2px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: 13px; font-weight: 700;
+    transition: all var(--dur-base) var(--ease-std);
+  }
+  .step-node.active .step-circle {
+    background: var(--brand-primary); border-color: var(--brand-primary); color: #fff;
+    box-shadow: 0 0 0 4px rgba(0,168,107,0.15);
+  }
+  .step-node.done .step-circle {
+    background: var(--brand-primary); border-color: var(--brand-primary); color: #fff;
+  }
+  .step-label {
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    transition: color var(--dur-base) var(--ease-std);
+  }
+  .step-node.active .step-label, .step-node.done .step-label { color: var(--text-primary); }
+
+  /* ============ MAIN ============ */
+  .main {
+    max-width: 1080px; margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+  .layout {
+    display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px;
+    align-items: flex-start;
+  }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  /* Left column */
+  .form-col { min-width: 0; }
+  .step-title {
+    font-family: 'Poppins'; font-size: 28px; font-weight: 800;
+    letter-spacing: -0.6px; line-height: 1.2; margin-bottom: 8px;
+  }
+  .step-sub {
+    font-size: 15px; color: var(--text-secondary); margin-bottom: 32px;
+  }
+
+  /* Right column - sticky summary */
+  .summary {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 24px;
+    /* offset to align with the first form card (after step-title + step-sub on the left) */
+    margin-top: 96px;
+    position: sticky; top: 96px;
+  }
+  @media (max-width: 900px) { .summary { margin-top: 0; } }
+  .summary h3 {
+    font-family: 'Poppins'; font-size: 13px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .sum-recipient {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px; border-radius: 10px;
+    background: var(--surface-page);
+    margin-bottom: 16px;
+  }
+  .sum-recipient.empty {
+    color: var(--text-muted);
+    border: 1px dashed var(--border-strong); background: transparent;
+    justify-content: center; padding: 20px;
+    font-size: 13px;
+  }
+  .sum-av {
+    width: 40px; height: 40px; border-radius: 50%;
+    color: #fff; font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .sum-name { font-size: 14px; font-weight: 700; }
+  .sum-dest { font-size: 12px; color: var(--text-secondary); }
+
+  .sum-amount-block {
+    text-align: center; padding: 20px 0; margin-bottom: 8px;
+    border-bottom: 1px dashed var(--border-subtle);
+  }
+  .sum-amount-block.empty { color: var(--text-muted); }
+  .sum-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 500; }
+  .sum-bigamt {
+    font-family: 'Poppins'; font-weight: 800;
+    font-size: 32px; letter-spacing: -0.5px;
+    font-feature-settings: "tnum"; line-height: 1.1;
+    color: var(--text-primary);
+  }
+  .sum-bigamt.muted { color: var(--text-muted); }
+
+  .sum-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; font-size: 13px;
+  }
+  .sum-row .lbl { color: var(--text-secondary); }
+  .sum-row .val { font-weight: 600; font-feature-settings: "tnum"; color: var(--text-primary); }
+  .sum-row.total {
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 8px; padding-top: 14px;
+    font-size: 15px; font-weight: 700;
+  }
+
+  .summary-cta {
+    width: 100%; height: 52px; margin-top: 20px;
+    background: var(--brand-primary); color: #fff;
+    border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; box-shadow: var(--elev-2);
+    transition: all var(--dur-fast) var(--ease-std);
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .summary-cta:hover:not(:disabled) { background: var(--brand-primary-pressed); }
+  .summary-cta:disabled {
+    background: var(--border-strong); color: var(--text-muted);
+    cursor: not-allowed; box-shadow: none;
+  }
+
+  .summary-trust {
+    margin-top: 16px; padding-top: 16px;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 11px; color: var(--text-secondary);
+    line-height: 1.6;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .summary-trust svg { color: var(--brand-primary); flex-shrink: 0; margin-top: 1px; }
+
+  /* Step toggling */
+  .step { display: none; }
+  body[data-step="1"] .step[data-step="1"],
+  body[data-step="2"] .step[data-step="2"],
+  body[data-step="3"] .step[data-step="3"] { display: block; }
+
+  /* Auth modal, processing, success — full-screen overlays */
+  body[data-step="4"] .stepper-wrap,
+  body[data-step="5"] .stepper-wrap,
+  body[data-step="6"] .stepper-wrap,
+  body[data-step="4"] .main,
+  body[data-step="5"] .main,
+  body[data-step="6"] .main { display: none; }
+
+  body[data-step="4"] .overlay-auth,
+  body[data-step="5"] .overlay-processing,
+  body[data-step="6"] .overlay-success { display: flex; }
+
+  /* Avatar gradients */
+  .av-1 { background: linear-gradient(135deg, #F472B6, #DB2777); }
+  .av-2 { background: linear-gradient(135deg, #60A5FA, #2563EB); }
+  .av-3 { background: linear-gradient(135deg, #34D399, #059669); }
+  .av-4 { background: linear-gradient(135deg, #FBBF24, #D97706); }
+  .av-5 { background: linear-gradient(135deg, #A78BFA, #7C3AED); }
+  .av-6 { background: linear-gradient(135deg, #FB7185, #E11D48); }
+
+  /* ========================================================
+     S1 — RECIPIENT PICKER (web)
+     ======================================================== */
+  .search {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px; padding: 14px 16px;
+    margin-bottom: 32px;
+    transition: border-color var(--dur-fast) var(--ease-std);
+  }
+  .search:focus-within { border-color: var(--brand-primary); }
+  .search input {
+    flex: 1; border: none; background: transparent; outline: none;
+    font-size: 14px; color: var(--text-primary);
+  }
+  .section-label {
+    font-size: 11px; font-weight: 700; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin-bottom: 14px;
+  }
+
+  .frequent {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 32px;
+  }
+  .freq-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px; padding: 16px; text-align: center;
+    cursor: pointer;
+    transition: all var(--dur-fast) var(--ease-std);
+  }
+  .freq-card:hover {
+    border-color: var(--brand-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--elev-2);
+  }
+  .freq-av {
+    width: 56px; height: 56px; border-radius: 50%;
+    color: #fff; font-weight: 700; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px; position: relative;
+  }
+  .freq-flag {
+    position: absolute; bottom: -2px; right: -2px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #fff; color: var(--text-primary);
+    font-size: 9px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff;
+  }
+  .freq-name { font-size: 13px; font-weight: 700; }
+  .freq-last { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+  .recipient-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    margin-bottom: 16px;
+  }
+  .rec-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px; cursor: pointer; border-radius: 10px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    transition: all var(--dur-fast) var(--ease-std);
+  }
+  .rec-row:hover { border-color: var(--brand-primary); background: var(--surface-raised); }
+  .rec-av {
+    width: 40px; height: 40px; border-radius: 50%;
+    color: #fff; font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .rec-info { flex: 1; min-width: 0; }
+  .rec-name { font-size: 14px; font-weight: 600; }
+  .rec-meta { font-size: 12px; color: var(--text-secondary); }
+
+  .add-new {
+    width: 100%; padding: 16px;
+    background: transparent; border: 2px dashed var(--border-strong);
+    border-radius: 12px; cursor: pointer;
+    color: var(--brand-primary); font-weight: 600; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .add-new:hover { border-color: var(--brand-primary); background: rgba(0,168,107,0.04); }
+
+  /* ========================================================
+     S2 — AMOUNT (web)
+     ======================================================== */
+  .amount-card {
+    background: linear-gradient(160deg, var(--brand-primary), var(--brand-primary-pressed));
+    border-radius: 16px; padding: 28px;
+    color: #fff; position: relative; overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .amount-card::after {
+    content: ''; position: absolute; right: -60px; top: -60px;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,196,116,0.18), transparent 70%);
+  }
+  .amount-block { position: relative; z-index: 1; }
+  .amount-label { font-size: 12px; opacity: 0.7; font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .amount-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .amount-input {
+    background: transparent; border: none; outline: none;
+    color: #fff; font-family: 'Poppins';
+    font-size: 40px; font-weight: 800; width: 60%;
+    font-feature-settings: "tnum"; letter-spacing: -1px;
+  }
+  .amount-input::placeholder { color: rgba(255,255,255,0.3); }
+  .curr-pill {
+    background: rgba(255,255,255,0.95); color: var(--brand-primary);
+    padding: 10px 16px; border-radius: 999px;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer;
+  }
+  select.curr-select {
+    -webkit-appearance: none; -moz-appearance: none; appearance: none;
+    border: none; outline: none; font-family: inherit;
+    padding: 10px 28px 10px 16px;
+    background:
+      rgba(255,255,255,0.95)
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2301559D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>")
+      no-repeat right 10px center;
+  }
+  select.curr-select:hover { background-color: #fff; }
+  select.curr-select option { color: var(--text-primary); background: #fff; font-weight: 600; }
+
+  .method-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 18px;
+  }
+  .method-chip.active {
+    background: var(--brand-primary); color: #fff; border-color: var(--brand-primary);
+  }
+  .method-chip.active:hover { color: #fff; }
+  .swap-divider {
+    display: flex; align-items: center; gap: 12px; margin: 12px 0;
+    color: rgba(255,255,255,0.5); font-size: 11px;
+  }
+  .swap-divider::before, .swap-divider::after {
+    content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.15);
+  }
+  .swap-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.12); border: none;
+    color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .quick-amounts {
+    display: flex; gap: 8px; margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .qa-chip {
+    padding: 10px 18px; border-radius: 999px;
+    background: var(--surface-card); border: 1px solid var(--border-subtle);
+    color: var(--text-primary); font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all var(--dur-fast) var(--ease-std);
+  }
+  .qa-chip:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+
+  .speed-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-bottom: 16px;
+  }
+  .speed-card {
+    padding: 18px; border-radius: 12px;
+    background: var(--surface-card);
+    border: 2px solid var(--border-subtle);
+    cursor: pointer;
+    transition: all var(--dur-fast) var(--ease-std);
+    position: relative;
+  }
+  .speed-card.selected {
+    border-color: var(--brand-primary);
+    background: rgba(0,168,107,0.04);
+  }
+  .speed-card.selected::after {
+    content: ''; position: absolute; top: 14px; right: 14px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--brand-primary);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+    background-position: center; background-repeat: no-repeat;
+  }
+  .speed-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .speed-time { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+  .speed-price { font-size: 14px; font-weight: 700; color: var(--brand-primary); font-feature-settings: "tnum"; }
+
+  /* ========================================================
+     S3 — REVIEW (web)
+     ======================================================== */
+  .review-section {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 20px; margin-bottom: 16px;
+  }
+  .review-section h4 {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+  .review-recipient {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .review-recipient .freq-av { margin: 0; width: 48px; height: 48px; font-size: 16px; }
+  .review-name { font-size: 16px; font-weight: 700; }
+  .review-dest { font-size: 13px; color: var(--text-secondary); }
+  .review-edit {
+    margin-left: auto;
+    background: transparent; border: none; cursor: pointer;
+    color: var(--brand-primary); font-size: 13px; font-weight: 600;
+  }
+
+  .review-summary-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .review-tile {
+    padding: 14px; border-radius: 10px;
+    background: var(--surface-page);
+  }
+  .review-tile-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+  .review-tile-val { font-size: 18px; font-weight: 700; font-feature-settings: "tnum"; }
+
+  .note-input {
+    width: 100%; padding: 14px 16px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    font-size: 14px; outline: none;
+    transition: border-color var(--dur-fast) var(--ease-std);
+  }
+  .note-input:focus { border-color: var(--brand-primary); }
+  .note-counter { font-size: 11px; color: var(--text-muted); margin-top: 4px; text-align: right; }
+
+  /* ========================================================
+     S4 — AUTHENTICATE (web overlay modal)
+     ======================================================== */
+  .overlay-auth, .overlay-processing, .overlay-success {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(10, 37, 64, 0.55);
+    backdrop-filter: blur(8px);
+    align-items: center; justify-content: center;
+    padding: 20px; z-index: 100;
+    animation: fadeIn 0.2s var(--ease-std);
+  }
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+  /* ============ ACCOUNT PICKER OVERLAY ============ */
+  .overlay-accounts {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(10, 37, 64, 0.55);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center;
+    padding: 20px; z-index: 120;
+    animation: fadeIn 0.18s var(--ease-std);
+  }
+  .overlay-accounts.show { display: flex; }
+  .acct-modal {
+    background: var(--surface-card);
+    border-radius: 16px;
+    width: 100%; max-width: 440px;
+    padding: 22px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+  }
+  .acct-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .acct-head h3 { font-family: 'Poppins'; font-size: 17px; font-weight: 700; margin-bottom: 2px; color: var(--text-primary); letter-spacing: -0.2px; }
+  .acct-head p { font-size: 13px; color: var(--text-secondary); }
+  .acct-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: transparent; border: none; cursor: pointer;
+    color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: background var(--dur-fast) var(--ease-std), color var(--dur-fast) var(--ease-std);
+  }
+  .acct-close:hover { background: var(--surface-page); color: var(--text-primary); }
+  .acct-list { display: flex; flex-direction: column; gap: 8px; }
+  .acct-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px; border-radius: 12px;
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    transition: border-color var(--dur-fast) var(--ease-std), background var(--dur-fast) var(--ease-std);
+  }
+  .acct-item:hover { border-color: var(--brand-primary); background: #fff; }
+  .acct-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: rgba(0,168,107,0.08); color: var(--brand-primary);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .acct-info { flex: 1; min-width: 0; }
+  .acct-bank { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .acct-num { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .acct-chev { color: var(--text-secondary); flex-shrink: 0; }
+  .auth-modal {
+    background: var(--surface-card);
+    border-radius: 20px;
+    width: 100%; max-width: 440px;
+    padding: 40px 32px;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+    animation: pop 0.3s var(--ease-std);
+  }
+  @keyframes pop { from { transform: scale(0.92); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+  .auth-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(0,168,107,0.08); color: var(--brand-primary);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .auth-title {
+    font-family: 'Poppins'; font-size: 22px; font-weight: 700;
+    margin-bottom: 8px; letter-spacing: -0.3px;
+  }
+  .auth-sub {
+    font-size: 14px; color: var(--text-secondary);
+    margin-bottom: 28px;
+  }
+  .pin-grid {
+    display: flex; gap: 10px; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .pin-box {
+    width: 44px; height: 56px; border-radius: 10px;
+    border: 2px solid var(--border-subtle);
+    background: var(--surface-card);
+    text-align: center; outline: none;
+    font-family: 'Poppins'; font-size: 22px; font-weight: 700;
+    color: var(--text-primary); font-feature-settings: "tnum";
+    transition: border-color var(--dur-fast) var(--ease-std);
+  }
+  .pin-box:focus { border-color: var(--brand-primary); }
+  .pin-box.filled { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
+  .auth-help { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+  .auth-cancel {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--text-secondary); font-size: 13px; font-weight: 600;
+    padding: 8px;
+  }
+  .auth-cancel:hover { color: var(--text-primary); }
+
+  /* ========================================================
+     S5 — PROCESSING
+     ======================================================== */
+  .processing-card {
+    background: var(--surface-card);
+    border-radius: 20px; padding: 56px 48px;
+    text-align: center; max-width: 440px; width: 100%;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+  }
+  .processing-icon {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px;
+    box-shadow: 0 20px 60px rgba(0,168,107,0.4);
+  }
+  .processing-icon svg { animation: fly 2s ease-in-out infinite; }
+  @keyframes fly {
+    0%, 100% { transform: translate(0,0) rotate(0); }
+    50% { transform: translate(8px,-8px) rotate(8deg); }
+  }
+  .processing-title { font-family: 'Poppins'; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .processing-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 28px; }
+  .proc-dots { display: flex; gap: 8px; justify-content: center; }
+  .proc-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--brand-primary);
+    animation: dotPulse 1.2s infinite;
+  }
+  .proc-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .proc-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dotPulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+
+  /* ========================================================
+     S6 — SUCCESS
+     ======================================================== */
+  .success-card {
+    background: var(--surface-card);
+    border-radius: 20px; padding: 48px 40px;
+    text-align: center; max-width: 480px; width: 100%;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+  }
+  .success-check {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: var(--success-bg);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    animation: pop 0.5s var(--ease-std);
+  }
+  .success-check svg path { stroke-dasharray: 30; stroke-dashoffset: 30; animation: draw 0.5s 0.2s var(--ease-std) forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .success-title { font-family: 'Poppins'; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .success-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 28px; }
+  .receipt {
+    background: var(--surface-page);
+    border-radius: 12px;
+    padding: 18px; margin-bottom: 20px; text-align: left;
+  }
+  .receipt-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px dashed var(--border-subtle);
+    font-size: 13px;
+  }
+  .receipt-row:last-child { border-bottom: none; }
+  .receipt-row .v { font-weight: 700; font-feature-settings: "tnum"; }
+  .receipt-ref {
+    background: var(--surface-card); border: 1px solid var(--border-subtle);
+    padding: 4px 10px; border-radius: 6px;
+    font-family: 'DM Sans', monospace;
+    font-size: 12px; cursor: pointer;
+  }
+  .success-actions {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
+  }
+  .btn {
+    height: 48px; border-radius: 10px; border: none;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all var(--dur-fast) var(--ease-std);
+  }
+  .btn-secondary {
+    background: var(--surface-card); color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+  }
+  .btn-secondary:hover { background: var(--surface-page); }
+  .btn-primary { background: var(--brand-primary); color: #fff; }
+  .btn-primary:hover { background: var(--brand-primary-pressed); }
+  .success-done {
+    width: 100%; height: 52px;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 900px) {
+    .layout { gap: 28px; }
+    .summary { position: static; }
+    .topbar { padding: 0 20px; }
+    .frequent { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 720px) {
+    .topbar { padding: 0 16px; gap: 8px; }
+    .secure-tag span { display: none; }
+    .lang-btn span[data-lang-current] { display: none; }
+    .stepper-wrap { padding: 18px 16px; }
+    .step-circle { width: 28px; height: 28px; font-size: 12px; }
+    .step-label { font-size: 10px; }
+    .main { padding: 28px 16px 64px; }
+    .step-title { font-size: 22px; line-height: 1.25; }
+    .step-sub { font-size: 14px; margin-bottom: 24px; }
+    .amount-card { padding: 22px; }
+    .amount-input { font-size: 32px; }
+    .review-section { padding: 16px; }
+    .review-summary-grid { grid-template-columns: 1fr; }
+    .speed-grid { grid-template-columns: 1fr; }
+    .frequent { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .recipient-grid { grid-template-columns: 1fr; }
+    .summary { padding: 18px; }
+    .summary-cta { height: 48px; font-size: 14px; }
+    .quick-amounts .qa-chip { padding: 9px 14px; font-size: 12px; }
+    .freq-card { padding: 12px; }
+    .freq-av { width: 48px; height: 48px; font-size: 16px; }
+    .pin-grid { gap: 6px; }
+    .pin-box { width: 38px; height: 50px; font-size: 18px; }
+    .auth-modal, .processing-card, .success-card { padding: 32px 22px; }
+    .success-actions { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 420px) {
+    .secure-tag { display: none; }
+    .topbar { gap: 4px; }
+    .step-label { display: none; }
+    .stepper { gap: 0; }
+    .stepper::before, .stepper::after { left: 16px; right: 16px; }
+    body[data-step="2"] .stepper::after { width: calc(33.33% - 8px); }
+    body[data-step="3"] .stepper::after { width: calc(66.66% - 8px); }
+    body[data-step="4"] .stepper::after,
+    body[data-step="5"] .stepper::after,
+    body[data-step="6"] .stepper::after { width: calc(100% - 32px); }
+  }
+
+  /* ============ SIDEBAR (app shell) ============ */
+  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  .page-col { display: flex; flex-direction: column; min-width: 0; }
+  .sidebar {
+    background: var(--surface-card);
+    border-right: 1px solid var(--border-subtle);
+    padding: 24px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    position: sticky; top: 0; height: 100vh;
+    z-index: 30;
+  }
+  .sidebar .logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 12px 24px;
+    text-decoration: none; color: inherit;
+    transition: opacity var(--dur-fast) var(--ease-std);
+  }
+  .sidebar .logo:hover { opacity: 0.85; }
+  .sidebar .logo:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 4px; border-radius: 4px; }
+  .nav-section { margin-top: 8px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 8px;
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 14px; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-std);
+    cursor: pointer;
+  }
+  .nav-item:hover { background: var(--surface-page); color: var(--text-primary); }
+  .nav-item.active {
+    background: rgba(0,168,107,0.08); color: var(--brand-primary); font-weight: 600;
+  }
+  /* topbar adjustments — sidebar handles the left side now */
+  .topbar { justify-content: flex-end; }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar {
+      position: fixed; top: 0; left: 0;
+      height: 100vh; width: 280px;
+      transform: translateX(-100%);
+      transition: transform 280ms var(--ease-std);
+      box-shadow: 4px 0 24px rgba(10,37,64,0.18);
+      z-index: 50;
+    }
+    body.sidebar-open .sidebar { transform: translateX(0); }
+  }
+</style>
+</head>
+<body data-step="1">
+
+<div class="app">
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar">
+  <a class="logo" href="dashboard-web.html" aria-label="RemitPay — Dashboard">
+    <div class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><ellipse cx="12" cy="12" rx="4" ry="9"/></svg></div>
+    <div class="logo-text">Remit<span>Pay</span></div>
+  </a>
+  <div class="nav-section">
+    <a class="nav-item" href="dashboard-web.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      <span data-i18n="nav.dashboard">Dashboard</span>
+    </a>
+    <a class="nav-item active" href="send-money-web.html" aria-current="page">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      <span data-i18n="nav.sendMoney">Send Money</span>
+    </a>
+    <a class="nav-item" href="add-money-web.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <span data-i18n="nav.addMoney">Add Money</span>
+    </a>
+    <a class="nav-item" href="recipients-web.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span data-i18n="nav.recipients">Recipients</span>
+    </a>
+    <a class="nav-item" href="transaction-history.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span data-i18n="nav.transactionHistory">Transaction history</span>
+    </a>
+    <a class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span data-i18n="nav.exchangeRates">Exchange Rates</span>
+    </a>
+    <a class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      <span data-i18n="nav.cards">Cards</span>
+    </a>
+    <a class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span data-i18n="nav.settings">Settings</span>
+    </a>
+    <a class="nav-item" href="help.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span data-i18n="nav.helpSupport">Help & Support</span>
+    </a>
+  </div>
+</aside>
+
+<div class="page-col">
+
+<!-- ============ TOPBAR ============ -->
+<header class="topbar">
+  <div class="topbar-help">
+    <span class="secure-tag">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span data-i18n="topbar.secureTransfer">Secure transfer</span>
+    </span>
+    <div class="lang-switcher" id="langSwitcher">
+      <button class="lang-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Change language">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span data-lang-current>EN</span>
+        <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language">
+        <li role="option" data-lang="en" tabindex="0">
+          <span class="lang-code">EN</span>
+          <span data-i18n="lang.en">English</span>
+          <svg class="check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </li>
+        <li role="option" data-lang="bn" tabindex="0">
+          <span class="lang-code">BN</span>
+          <span data-i18n="lang.bn">বাংলা</span>
+          <svg class="check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </li>
+      </ul>
+    </div>
+    <button class="logout-btn" type="button" data-auth-logout data-i18n-aria-label="auth.logout" aria-label="Log out" data-i18n-title="auth.logout" title="Log out">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+    <a href="dashboard-web.html" class="close-btn" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </a>
+  </div>
+</header>
+
+<!-- ============ STEPPER ============ -->
+<div class="stepper-wrap">
+  <div class="stepper">
+    <div class="step-node active" data-i="1"><div class="step-circle">1</div><span class="step-label" data-i18n="sendMoney.stepper.amount">Amount</span></div>
+    <div class="step-node" data-i="2"><div class="step-circle">2</div><span class="step-label" data-i18n="sendMoney.stepper.recipient">Recipient</span></div>
+    <div class="step-node" data-i="3"><div class="step-circle">3</div><span class="step-label" data-i18n="sendMoney.stepper.review">Review</span></div>
+    <div class="step-node" data-i="4"><div class="step-circle">4</div><span class="step-label" data-i18n="sendMoney.stepper.send">Send</span></div>
+  </div>
+</div>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+  <div class="layout">
+
+    <!-- LEFT: form column -->
+    <div class="form-col">
+
+      <!-- S1 (Amount) -->
+      <section class="step" data-step="1">
+        <h1 class="step-title" data-i18n="sendMoney.s2.title">How much would you like to send?</h1>
+        <p class="step-sub" data-i18n="sendMoney.s2.sub">Enter an amount in either currency. We update both as you type.</p>
+
+        <div class="amount-card">
+          <div class="amount-block">
+            <div class="amount-label" data-i18n="sendMoney.s2.youSend">You send</div>
+            <div class="amount-row">
+              <input class="amount-input" id="sendAmount" type="text" inputmode="decimal" placeholder="0">
+              <span class="curr-pill" id="sendCurr">USD</span>
+            </div>
+            <div class="swap-divider">
+              <button class="swap-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg></button>
+            </div>
+            <div class="amount-label" data-i18n="sendMoney.s2.theyGet">They get</div>
+            <div class="amount-row">
+              <input class="amount-input" id="getAmount" type="text" inputmode="decimal" placeholder="0">
+              <select class="curr-pill curr-select" id="getCurr" aria-label="Receive currency">
+                <option value="BDT" selected>BDT</option>
+                <option value="INR">INR</option>
+                <option value="PHP">PHP</option>
+                <option value="MXN">MXN</option>
+                <option value="NGN">NGN</option>
+                <option value="COP">COP</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-label" data-i18n="common.quickAmounts">Quick amounts</div>
+        <div class="quick-amounts">
+          <button class="qa-chip" data-amt="50">$50</button>
+          <button class="qa-chip" data-amt="100">$100</button>
+          <button class="qa-chip" data-amt="200">$200</button>
+          <button class="qa-chip" data-amt="500">$500</button>
+          <button class="qa-chip" data-amt="1000">$1,000</button>
+        </div>
+
+        <div class="section-label" data-i18n="sendMoney.s2.deliverySpeed">Delivery speed</div>
+        <div class="speed-grid">
+          <div class="speed-card selected" data-speed="standard" data-fee="0.99">
+            <div class="speed-name" data-i18n="sendMoney.s2.standardName">Standard</div>
+            <div class="speed-time" data-i18n="sendMoney.s2.standardTime">Arrives in ~1 hour</div>
+            <div class="speed-price" data-i18n="common.free">Free</div>
+          </div>
+          <div class="speed-card" data-speed="instant" data-fee="2.98">
+            <div class="speed-name" data-i18n="sendMoney.s2.instantName">Instant</div>
+            <div class="speed-time" data-i18n="sendMoney.s2.instantTime">Under 30 seconds</div>
+            <div class="speed-price" data-i18n="sendMoney.s2.instantPrice">+$1.99</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S2 (Recipient) -->
+      <section class="step" data-step="2">
+        <h1 class="step-title" data-i18n="sendMoney.s1.title">Who are you sending to?</h1>
+        <p class="step-sub" data-i18n="sendMoney.s1.sub">Pick a saved recipient or add someone new.</p>
+
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="searchInput" data-i18n-placeholder="sendMoney.s1.searchPlaceholder" placeholder="Search by name or country">
+        </div>
+
+        <div class="section-label" data-i18n="sendMoney.s1.payMethod">Payment option</div>
+        <div class="method-chips" id="methodChips" role="tablist" aria-label="Filter by payment type">
+          <button type="button" class="qa-chip method-chip active" data-method="all" data-i18n="recipients.filterAll">All</button>
+          <button type="button" class="qa-chip method-chip" data-method="Bank" data-i18n="recipients.type.bank">Bank</button>
+          <button type="button" class="qa-chip method-chip" data-method="Mobile wallet" data-i18n="recipients.type.mobile">Mobile wallet</button>
+          <button type="button" class="qa-chip method-chip" data-method="Cash pickup" data-i18n="recipients.type.cash">Cash pickup</button>
+        </div>
+
+        <div class="section-label" data-i18n="sendMoney.s1.frequent">Frequent</div>
+        <div class="frequent" id="frequentList"></div>
+
+        <div class="section-label" data-i18n="sendMoney.s1.allRecipients">All recipients</div>
+        <div class="recipient-grid" id="recipientList"></div>
+
+        <button class="add-new" id="addRecipientBtn" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span data-i18n="sendMoney.s1.addNew">Add new recipient</span>
+        </button>
+      </section>
+
+      <!-- S3 -->
+      <section class="step" data-step="3">
+        <h1 class="step-title" data-i18n="sendMoney.s3.title">Review your transfer</h1>
+        <p class="step-sub" data-i18n="sendMoney.s3.sub">Check the details below. You can edit any section before confirming.</p>
+
+        <div class="review-section">
+          <h4 data-i18n="sendMoney.s3.recipientLabel">Recipient</h4>
+          <div class="review-recipient">
+            <div class="freq-av" id="reviewAv">M</div>
+            <div>
+              <div class="review-name" id="reviewName">Mom</div>
+              <div class="review-dest" id="reviewDest">GCash · 0917 ••• 4221</div>
+            </div>
+            <button type="button" class="review-edit" data-goto="2" data-i18n="common.edit">Edit</button>
+          </div>
+        </div>
+
+        <div class="review-section">
+          <h4 data-i18n="sendMoney.s3.amountRateLabel">Amount & rate</h4>
+          <div class="review-summary-grid">
+            <div class="review-tile">
+              <div class="review-tile-label" data-i18n="sendMoney.s2.youSend">You send</div>
+              <div class="review-tile-val" id="reviewSend">$250.00</div>
+            </div>
+            <div class="review-tile">
+              <div class="review-tile-label" data-i18n="sendMoney.s2.theyGet">They get</div>
+              <div class="review-tile-val" id="reviewGet">₱14,210</div>
+            </div>
+          </div>
+          <div style="margin-top:12px; font-size:13px; color:var(--text-secondary); display:flex; justify-content:space-between">
+            <span><span data-i18n="sendMoney.summary.exchangeRate">Rate</span> · <span id="reviewRate">1 USD = 56.84 PHP</span></span>
+            <button type="button" class="review-edit" data-goto="1" style="padding:0" data-i18n="common.edit">Edit</button>
+          </div>
+        </div>
+
+        <div class="review-section">
+          <h4 data-i18n="sendMoney.s3.addNote">Add a note (optional)</h4>
+          <input class="note-input" id="noteInput" data-i18n-placeholder="sendMoney.s3.notePlaceholder" placeholder="A short message for your recipient" maxlength="50">
+          <div class="note-counter"><span id="noteLen">0</span>/50</div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT: summary panel -->
+    <aside>
+      <div class="summary">
+        <h3 data-i18n="sendMoney.summary.title">Transfer summary</h3>
+
+        <div class="sum-recipient empty" id="sumRecipient" data-i18n="sendMoney.summary.pickRecipient">
+          Select a recipient to begin
+        </div>
+
+        <div class="sum-amount-block empty" id="sumAmountBlock">
+          <div class="sum-label" data-i18n="sendMoney.summary.theyGet">They get</div>
+          <div class="sum-bigamt muted" id="sumBigAmt">—</div>
+        </div>
+
+        <div class="sum-row">
+          <span class="lbl" data-i18n="sendMoney.summary.youSend">You send</span>
+          <span class="val" id="sumSend">—</span>
+        </div>
+        <div class="sum-row">
+          <span class="lbl" data-i18n="sendMoney.summary.exchangeRate">Exchange rate</span>
+          <span class="val" id="sumRate">—</span>
+        </div>
+        <div class="sum-row">
+          <span class="lbl" data-i18n="sendMoney.summary.fee">Fee</span>
+          <span class="val" id="sumFee">—</span>
+        </div>
+        <div class="sum-row total">
+          <span data-i18n="sendMoney.summary.total">Total</span>
+          <span class="val" id="sumTotal">—</span>
+        </div>
+
+        <button class="summary-cta" id="primaryBtn" disabled>Continue</button>
+
+        <div class="summary-trust">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-i18n="sendMoney.summary.trust">Your money is safe. We're licensed by FinCEN and protect funds up to $250,000.</span>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+</div><!-- /.page-col -->
+</div><!-- /.app -->
+
+<!-- ============ ACCOUNT PICKER OVERLAY ============ -->
+<div class="overlay-accounts" id="acctOverlay" role="dialog" aria-modal="true" aria-labelledby="acctTitle">
+  <div class="acct-modal">
+    <div class="acct-head">
+      <div>
+        <h3 id="acctTitle" data-i18n="accountPicker.title">Choose an account</h3>
+        <p data-i18n="accountPicker.sub">Pick which account you'd like to send to.</p>
+      </div>
+      <button class="acct-close" type="button" id="acctCloseBtn" data-i18n-aria-label="accountPicker.close" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="acct-list" id="acctList"></div>
+  </div>
+</div>
+
+<!-- ============ S4 AUTH OVERLAY ============ -->
+<div class="overlay-auth">
+  <div class="auth-modal">
+    <div class="auth-icon">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <div class="auth-title" data-i18n="sendMoney.auth.title">Confirm it's you</div>
+    <div class="auth-sub" id="authSub">Sending $250.99 to Mom in Manila</div>
+
+    <div class="pin-grid" id="pinGrid">
+      <input class="pin-box" maxlength="1" inputmode="numeric" data-i="0">
+      <input class="pin-box" maxlength="1" inputmode="numeric" data-i="1">
+      <input class="pin-box" maxlength="1" inputmode="numeric" data-i="2">
+      <input class="pin-box" maxlength="1" inputmode="numeric" data-i="3">
+      <input class="pin-box" maxlength="1" inputmode="numeric" data-i="4">
+      <input class="pin-box" maxlength="1" inputmode="numeric" data-i="5">
+    </div>
+    <div class="auth-help" data-i18n="sendMoney.auth.hint">Enter your 6-digit PIN</div>
+    <button class="auth-cancel" id="authCancel" data-i18n="common.cancel">Cancel</button>
+  </div>
+</div>
+
+<!-- ============ S5 PROCESSING OVERLAY ============ -->
+<div class="overlay-processing">
+  <div class="processing-card">
+    <div class="processing-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </div>
+    <div class="processing-title" id="procTitle">Sending to Mom…</div>
+    <div class="processing-sub" data-i18n="sendMoney.processing.sub">This usually takes a few seconds</div>
+    <div class="proc-dots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<!-- ============ S6 SUCCESS OVERLAY ============ -->
+<div class="overlay-success">
+  <div class="success-card">
+    <div class="success-check">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--success-base)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="success-title" id="successTitle">On the way to Mom</div>
+    <div class="success-sub" data-i18n="sendMoney.success.sub">Arrives in ~3 min</div>
+
+    <div class="receipt">
+      <div class="receipt-row">
+        <span data-i18n="sendMoney.success.youSent">You sent</span>
+        <span class="v" id="rcptSend">$250.99</span>
+      </div>
+      <div class="receipt-row">
+        <span data-i18n="sendMoney.success.theyGet">They get</span>
+        <span class="v" id="rcptGet">₱14,210</span>
+      </div>
+      <div class="receipt-row">
+        <span data-i18n="common.reference">Reference</span>
+        <span class="receipt-ref" id="rcptRef">RP-9F4K2A</span>
+      </div>
+    </div>
+
+    <div class="success-actions">
+      <button class="btn btn-secondary" id="shareBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        <span data-i18n="sendMoney.success.share">Share receipt</span>
+      </button>
+      <button class="btn btn-secondary" id="againBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        <span data-i18n="sendMoney.success.again">Send again</span>
+      </button>
+    </div>
+    <button class="btn btn-primary success-done" data-i18n="sendMoney.success.done" onclick="window.location.href='dashboard-web.html'">Done</button>
+  </div>
+</div>
+
+<script src="locales/i18n.js"></script>
+<script src="auth.js"></script>
+<script src="recipients-store.js"></script>
+<script src="recipient-modal.js"></script>
+<script>
+  const t = (k, p) => (window.i18n ? window.i18n.t(k, p) : k);
+  // ============ DATA ============
+  // Recipients live in window.recipientsStore (localStorage-backed). Always read via list() so
+  // we see add/edit/delete changes from this page or the dedicated Recipients page.
+  const getRecipients = () => (window.recipientsStore ? window.recipientsStore.list() : []);
+
+  const state = { step: 1, recipient: null, sendAmt: '', destCurr: 'BDT', methodFilter: 'all', speed: 'standard', fee: 0.99, note: '' };
+
+  // Source of truth for rates (matches recipients-store COUNTRY_META).
+  const META = (window.recipientsStore && window.recipientsStore.COUNTRY_META) || {};
+  const CURRENCY_INFO = {
+    BDT: { symbol: '৳', rate: META.bangladesh?.rate  ?? 109.45  },
+    INR: { symbol: '₹', rate: META.india?.rate       ?? 83.42   },
+    PHP: { symbol: '₱', rate: META.philippines?.rate ?? 56.84   },
+    MXN: { symbol: '$', rate: META.mexico?.rate      ?? 17.20   },
+    NGN: { symbol: '₦', rate: META.nigeria?.rate     ?? 687.50  },
+    COP: { symbol: '$', rate: META.colombia?.rate    ?? 4112.30 },
+  };
+  // Pick rate + symbol for the active corridor: recipient overrides destCurr.
+  function currentInfo() {
+    if (state.recipient) {
+      return { rate: state.recipient.rate, symbol: state.recipient.symbol, curr: state.recipient.curr };
+    }
+    const info = CURRENCY_INFO[state.destCurr] || CURRENCY_INFO.BDT;
+    return { rate: info.rate, symbol: info.symbol, curr: state.destCurr };
+  }
+
+  const params = new URLSearchParams(location.search);
+  if (params.get('recipient')) state.recipient = getRecipients().find(r => r.id === params.get('recipient'));
+  if (params.get('amount')) state.sendAmt = params.get('amount');
+  if (state.recipient) state.destCurr = state.recipient.curr;
+
+  // ============ NAV ============
+  function go(step) {
+    state.step = step;
+    document.body.dataset.step = step;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    document.querySelectorAll('.step-node').forEach((n, i) => {
+      const idx = i + 1;
+      n.classList.remove('active', 'done');
+      if (idx < step) n.classList.add('done');
+      else if (idx === Math.min(step, 4)) n.classList.add('active');
+
+      const circle = n.querySelector('.step-circle');
+      if (idx < step) circle.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      else circle.textContent = idx;
+    });
+
+    renderSummary();
+    if (step === 3) renderReview();
+    if (step === 4) {
+      document.querySelectorAll('.pin-box').forEach(b => { b.value = ''; b.classList.remove('filled'); });
+      setTimeout(() => document.querySelector('.pin-box').focus(), 300);
+    }
+  }
+
+  // ============ S2 RENDER ============
+  function recipientMatchesFilter(r) {
+    if (state.methodFilter === 'all') return true;
+    return (r.method || '') === state.methodFilter;
+  }
+
+  function relationLabel(r) {
+    if (!r || !r.relation) return '';
+    const key = `relation.${r.relation}`;
+    const v = t(key);
+    return (v === key) ? r.relation : v;
+  }
+
+  function renderRecipients() {
+    const freqEl = document.getElementById('frequentList');
+    const listEl = document.getElementById('recipientList');
+    freqEl.innerHTML = ''; listEl.innerHTML = '';
+
+    const recipients = getRecipients().filter(recipientMatchesFilter);
+    recipients.filter(r => r.freq).forEach(r => {
+      const rel = relationLabel(r);
+      const card = document.createElement('div');
+      card.className = 'freq-card';
+      card.innerHTML = `
+        <div class="freq-av ${r.cls}">${r.av}<span class="freq-flag">${r.flag || ''}</span></div>
+        <div class="freq-name">${(r.name || '').split(' ')[0]}</div>
+        <div class="freq-last">${rel}</div>`;
+      card.addEventListener('click', () => selectRecipient(r));
+      freqEl.appendChild(card);
+    });
+
+    recipients.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'rec-row';
+      row.innerHTML = `
+        <div class="rec-av ${r.cls}">${r.av}</div>
+        <div class="rec-info">
+          <div class="rec-name">${r.name}</div>
+          <div class="rec-meta">${relationLabel(r)}</div>
+        </div>`;
+      row.addEventListener('click', () => selectRecipient(r));
+      listEl.appendChild(row);
+    });
+  }
+
+  document.getElementById('searchInput').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase();
+    const visibleRecipients = getRecipients().filter(recipientMatchesFilter);
+    document.querySelectorAll('#recipientList .rec-row').forEach((row, i) => {
+      const r = visibleRecipients[i];
+      if (!r) return;
+      const match = (r.name || '').toLowerCase().includes(q)
+        || (r.country || '').toLowerCase().includes(q)
+        || (r.dest || '').toLowerCase().includes(q);
+      row.style.display = match ? '' : 'none';
+    });
+  });
+
+  // Payment-method filter chips on the recipient step.
+  document.querySelectorAll('#methodChips .method-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#methodChips .method-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      state.methodFilter = chip.dataset.method;
+      renderRecipients();
+      document.getElementById('searchInput').value = '';
+    });
+  });
+
+  // "Add new recipient" — open the shared modal, then auto-select the new recipient.
+  document.getElementById('addRecipientBtn').addEventListener('click', () => {
+    if (!window.openAddRecipientModal) return;
+    window.openAddRecipientModal({
+      onSave: (rec) => { if (rec) selectRecipient(rec); }
+    });
+  });
+
+  // Refresh recipient list whenever the store changes (add / edit / delete from any page).
+  if (window.recipientsStore) {
+    window.recipientsStore.onChange(() => {
+      renderRecipients();
+      // If the currently selected recipient was deleted, reset to step 1.
+      if (state.recipient && !window.recipientsStore.get(state.recipient.id)) {
+        state.recipient = null;
+        go(1);
+      } else if (state.recipient) {
+        // Refresh in-memory copy in case the recipient was edited.
+        const fresh = window.recipientsStore.get(state.recipient.id);
+        if (fresh) state.recipient = fresh;
+        if (state.step === 3) renderReview();
+        renderSummary();
+      }
+    });
+  }
+
+  function selectRecipient(r) {
+    // Multi-account recipients prompt the user to pick which account to send to.
+    if (r.accounts && r.accounts.length > 1) {
+      openAccountPicker(r);
+      return;
+    }
+    finalizeRecipient(r);
+  }
+
+  function finalizeRecipient(r) {
+    state.recipient = r;
+    state.destCurr = r.curr;
+    const getCurrEl = document.getElementById('getCurr');
+    if (getCurrEl) getCurrEl.value = r.curr;
+    go(3);
+    recompute();
+  }
+
+  // ============ ACCOUNT PICKER ============
+  const acctOverlay = document.getElementById('acctOverlay');
+  const acctListEl  = document.getElementById('acctList');
+  const acctCloseBtn = document.getElementById('acctCloseBtn');
+
+  function destFromAccount(a) {
+    const label = a.bankName || a.walletProvider || a.pickupProvider || '';
+    const sub   = a.accountNumber || a.phone || a.city || '';
+    return [label, sub].filter(Boolean).join(' · ');
+  }
+
+  function openAccountPicker(r) {
+    acctListEl.innerHTML = '';
+    (r.accounts || []).forEach((a) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'acct-item';
+      const label = a.bankName || a.walletProvider || a.pickupProvider || '';
+      const sub   = a.accountNumber || a.phone || a.city || '';
+      item.innerHTML = `
+        <div class="acct-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18M5 10v8m4-8v8m6-8v8m4-8v8M3 21h18M2 7l10-5 10 5"/></svg>
+        </div>
+        <div class="acct-info">
+          <div class="acct-bank">${label}</div>
+          <div class="acct-num">${sub}</div>
+        </div>
+        <svg class="acct-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+      item.addEventListener('click', () => {
+        closeAccountPicker();
+        // Build a recipient variant that uses the picked account's destination,
+        // then continue into the review/summary flow.
+        const variant = { ...r, ...a, dest: destFromAccount(a) };
+        finalizeRecipient(variant);
+      });
+      acctListEl.appendChild(item);
+    });
+    acctOverlay.classList.add('show');
+  }
+  function closeAccountPicker() { acctOverlay.classList.remove('show'); }
+  acctCloseBtn.addEventListener('click', closeAccountPicker);
+  acctOverlay.addEventListener('click', (e) => { if (e.target === acctOverlay) closeAccountPicker(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && acctOverlay.classList.contains('show')) closeAccountPicker();
+  });
+
+  // ============ S1 AMOUNT ============
+  function recompute() {
+    const send = parseFloat(state.sendAmt) || 0;
+    const info = currentInfo();
+    const got = send * info.rate;
+    document.getElementById('getAmount').value = got > 0 ? got.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '';
+    renderSummary();
+  }
+
+  document.getElementById('sendAmount').addEventListener('input', e => {
+    state.sendAmt = e.target.value.replace(/[^\d.]/g, '');
+    e.target.value = state.sendAmt;
+    recompute();
+  });
+
+  document.getElementById('getAmount').addEventListener('input', e => {
+    const info = currentInfo();
+    const got = parseFloat(e.target.value.replace(/[^\d.]/g, '')) || 0;
+    state.sendAmt = got ? (got / info.rate).toFixed(2) : '';
+    document.getElementById('sendAmount').value = state.sendAmt;
+    renderSummary();
+  });
+
+  document.getElementById('getCurr').addEventListener('change', e => {
+    // Switching currency is only meaningful before a recipient is selected.
+    if (state.recipient) {
+      e.target.value = state.recipient.curr;
+      return;
+    }
+    state.destCurr = e.target.value;
+    recompute();
+  });
+
+  document.querySelectorAll('.qa-chip').forEach(c => {
+    c.addEventListener('click', () => {
+      state.sendAmt = c.dataset.amt;
+      document.getElementById('sendAmount').value = state.sendAmt;
+      recompute();
+    });
+  });
+
+  document.querySelectorAll('.speed-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.speed-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      state.speed = card.dataset.speed;
+      state.fee = parseFloat(card.dataset.fee);
+      renderSummary();
+    });
+  });
+
+  // ============ SUMMARY (right panel) ============
+  function renderSummary() {
+    const r = state.recipient;
+    const send = parseFloat(state.sendAmt) || 0;
+    const total = send + state.fee;
+    const info = currentInfo();
+    const got = send * info.rate;
+
+    const recEl = document.getElementById('sumRecipient');
+    if (r) {
+      recEl.classList.remove('empty');
+      recEl.removeAttribute('data-i18n');
+      recEl.innerHTML = `<div class="sum-av ${r.cls}">${r.av}</div><div><div class="sum-name">${r.name}</div><div class="sum-dest">${r.dest}</div></div>`;
+    } else {
+      recEl.classList.add('empty');
+      recEl.setAttribute('data-i18n', 'sendMoney.summary.pickRecipient');
+      recEl.textContent = t('sendMoney.summary.pickRecipient');
+    }
+
+    const amtBlock = document.getElementById('sumAmountBlock');
+    const big = document.getElementById('sumBigAmt');
+    if (send > 0) {
+      amtBlock.classList.remove('empty');
+      big.classList.remove('muted');
+      big.textContent = info.symbol + got.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    } else {
+      amtBlock.classList.add('empty');
+      big.classList.add('muted');
+      big.textContent = '—';
+    }
+
+    document.getElementById('sumSend').textContent = send > 0 ? '$' + send.toFixed(2) : '—';
+    document.getElementById('sumRate').textContent = `1 USD = ${info.rate.toFixed(2)} ${info.curr}`;
+    document.getElementById('sumFee').textContent = '$' + state.fee.toFixed(2);
+    document.getElementById('sumTotal').textContent = send > 0 ? '$' + total.toFixed(2) : '—';
+
+    const btn = document.getElementById('primaryBtn');
+    if (state.step === 1) {
+      // Amount step
+      btn.disabled = !(send > 0);
+      btn.textContent = send > 0 ? t('sendMoney.cta.continueToRecipient') : t('sendMoney.cta.enterAmount');
+    } else if (state.step === 2) {
+      // Recipient step
+      btn.disabled = !r;
+      btn.textContent = r ? t('sendMoney.cta.continueToReview') : t('sendMoney.cta.pickRecipient');
+    } else if (state.step === 3) {
+      btn.disabled = false;
+      btn.textContent = t('sendMoney.cta.confirmSend', { amount: '$' + total.toFixed(2) });
+    }
+  }
+
+  document.getElementById('primaryBtn').addEventListener('click', () => {
+    const send = parseFloat(state.sendAmt) || 0;
+    if (state.step === 1 && send > 0) go(2);
+    else if (state.step === 2 && state.recipient) go(3);
+    else if (state.step === 3) go(4);
+  });
+
+  // ============ S3 REVIEW ============
+  function renderReview() {
+    if (!state.recipient) return;
+    const r = state.recipient;
+    document.getElementById('reviewAv').className = 'freq-av ' + r.cls;
+    document.getElementById('reviewAv').innerHTML = r.av + `<span class="freq-flag">${r.flag}</span>`;
+    document.getElementById('reviewName').textContent = r.name;
+    document.getElementById('reviewDest').textContent = r.dest;
+
+    const send = parseFloat(state.sendAmt) || 0;
+    const got = (send * r.rate).toLocaleString('en-US', { maximumFractionDigits: 0 });
+    document.getElementById('reviewSend').textContent = '$' + send.toFixed(2);
+    document.getElementById('reviewGet').textContent = r.symbol + got;
+    document.getElementById('reviewRate').textContent = `1 USD = ${r.rate.toFixed(2)} ${r.curr}`;
+
+    const firstName = r.name.split(' ')[0];
+    document.getElementById('authSub').textContent =
+      t('sendMoney.auth.subTpl', { amount: '$' + (send + state.fee).toFixed(2), name: firstName });
+    document.getElementById('procTitle').textContent =
+      t('sendMoney.processing.titleTpl', { name: firstName });
+    document.getElementById('successTitle').textContent =
+      t('sendMoney.success.titleTpl', { name: firstName });
+    document.getElementById('rcptSend').textContent = '$' + (send + state.fee).toFixed(2);
+    document.getElementById('rcptGet').textContent = r.symbol + got;
+  }
+
+  document.querySelectorAll('.review-edit').forEach(b => {
+    b.addEventListener('click', () => go(parseInt(b.dataset.goto, 10)));
+  });
+
+  document.getElementById('noteInput').addEventListener('input', e => {
+    state.note = e.target.value;
+    document.getElementById('noteLen').textContent = e.target.value.length;
+  });
+
+  // ============ S4 PIN ============
+  const pinBoxes = document.querySelectorAll('.pin-box');
+  pinBoxes.forEach((box, i) => {
+    box.addEventListener('input', e => {
+      const v = e.target.value.replace(/\D/g, '');
+      e.target.value = v;
+      if (v) {
+        box.classList.add('filled');
+        if (i < 5) pinBoxes[i + 1].focus();
+        else {
+          setTimeout(() => go(5), 200);
+          setTimeout(() => go(6), 1800);
+        }
+      } else {
+        box.classList.remove('filled');
+      }
+    });
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !box.value && i > 0) pinBoxes[i - 1].focus();
+    });
+  });
+
+  document.getElementById('authCancel').addEventListener('click', () => go(3));
+
+  // ============ S6 ACTIONS ============
+  document.getElementById('againBtn').addEventListener('click', () => {
+    state.sendAmt = '';
+    document.getElementById('sendAmount').value = '';
+    document.getElementById('getAmount').value = '';
+    go(2);
+  });
+
+  document.getElementById('shareBtn').addEventListener('click', e => {
+    const ref = document.getElementById('rcptRef').textContent;
+    if (navigator.share) {
+      navigator.share({
+        title: t('sendMoney.success.shareTitle'),
+        text: t('sendMoney.success.shareTextTpl', { ref }),
+      });
+    } else {
+      navigator.clipboard?.writeText(ref);
+      e.currentTarget.textContent = t('sendMoney.success.copied');
+    }
+  });
+
+  document.getElementById('rcptRef').addEventListener('click', () => {
+    navigator.clipboard?.writeText(document.getElementById('rcptRef').textContent);
+  });
+
+  // ============ INIT ============
+  renderRecipients();
+  const getCurrEl = document.getElementById('getCurr');
+  if (getCurrEl) getCurrEl.value = state.destCurr;
+  if (state.sendAmt) document.getElementById('sendAmount').value = state.sendAmt;
+
+  // Pick the right starting step based on what was passed in:
+  //   recipient + amount → review;  amount only → recipient;  else → amount entry.
+  const hasAmount = (parseFloat(state.sendAmt) || 0) > 0;
+  const initStep = (state.recipient && hasAmount) ? 3
+                 : hasAmount ? 2
+                 : 1;
+  go(initStep);
+  recompute();
+
+  // Re-render dynamic JS-rendered text on language change.
+  function refreshDynamic() {
+    renderRecipients();
+    if (state.recipient) renderReview();
+    renderSummary();
+  }
+  document.addEventListener('languagechange', refreshDynamic);
+  if (window.i18n && window.i18n.lang) refreshDynamic();
+</script>
+</body>
+</html>

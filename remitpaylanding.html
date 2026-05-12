@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RemitPay — Send Money Globally</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #0A2540;
+    --secondary: #2F80ED;
+    --accent: #00C474;
+    --bg: #F4F8FC;
+    --text: #0A2540;
+    --muted: #6B8299;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+ 
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 60px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(0,168,107,0.08);
+  }
+  .nav-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logo-mark {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: linear-gradient(135deg, #00A86B, #00C474);
+    color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .nav-logo-text { font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 800; color: var(--primary); }
+  .nav-logo-text span { color: var(--accent); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--text); font-size: 14px; font-weight: 500; opacity: 0.72; transition: opacity .2s; }
+  .nav-links a:hover { opacity: 1; color: var(--primary); }
+  .nav-cta {
+    background: var(--primary); color: #fff; border: none; padding: 10px 24px;
+    border-radius: 100px; font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background .2s, transform .15s; font-family: 'DM Sans', sans-serif;
+  }
+  .nav-cta:hover { background: var(--secondary); transform: translateY(-1px); }
+ 
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #00A86B 0%, #0A2540 55%, #0d3a6b 100%);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center;
+    padding: 120px 60px 80px; gap: 60px;
+  }
+  .hero-dots {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .hero-orb {
+    position: absolute; width: 700px; height: 700px; border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,196,116,0.18) 0%, transparent 70%);
+    top: 50%; left: 55%; transform: translate(-50%, -50%);
+  }
+  .hero-left { flex: 1; position: relative; z-index: 2; max-width: 560px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,196,116,0.15); border: 1px solid rgba(0,196,116,0.3);
+    color: var(--accent); padding: 6px 16px; border-radius: 100px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+    text-transform: uppercase; margin-bottom: 28px;
+  }
+  .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
+  .hero h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(36px, 5vw, 62px); font-weight: 800;
+    color: #fff; line-height: 1.08; letter-spacing: -1.5px; margin-bottom: 24px;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+  .hero-sub { color: rgba(255,255,255,0.7); font-size: 17px; line-height: 1.65; max-width: 420px; margin-bottom: 40px; }
+  .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 44px; }
+  .btn-primary {
+    background: var(--accent); color: #0A2540; padding: 14px 32px;
+    border-radius: 100px; font-weight: 700; font-size: 15px; border: none; cursor: pointer;
+    transition: all .2s; box-shadow: 0 8px 30px rgba(0,196,116,0.4);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(0,196,116,0.5); }
+  .btn-outline {
+    background: transparent; color: #fff; padding: 14px 32px;
+    border-radius: 100px; font-weight: 600; font-size: 15px;
+    border: 1.5px solid rgba(255,255,255,0.3); cursor: pointer;
+    transition: all .2s; font-family: 'DM Sans', sans-serif;
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); }
+  .hero-trust { display: flex; align-items: center; gap: 14px; color: rgba(255,255,255,0.55); font-size: 13px; }
+  .trust-avatars { display: flex; }
+  .trust-avatars span {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid rgba(0,196,116,0.5);
+    background: linear-gradient(135deg, #2F80ED, #00A86B);
+    margin-left: -8px; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #fff; font-weight: 700;
+  }
+  .trust-avatars span:first-child { margin-left: 0; }
+ 
+  /* PHONE MOCKUP */
+  .hero-right { flex: 1; position: relative; z-index: 2; display: flex; justify-content: center; align-items: center; min-height: 520px; }
+  .phone-wrap { position: relative; animation: floatPhone 4s ease-in-out infinite; }
+  @keyframes floatPhone { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+  .phone-glow {
+    position: absolute; inset: -50px; border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,196,116,0.38) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .phone-body {
+    width: 248px; height: 494px; background: linear-gradient(160deg, #111827, #1a2f4b);
+    border-radius: 38px; border: 2px solid rgba(0,196,116,0.28);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.1);
+    overflow: hidden; position: relative;
+  }
+  .phone-screen { position: absolute; inset: 10px; background: linear-gradient(160deg, #0f1f35, #162a44); border-radius: 30px; padding: 22px 18px; display: flex; flex-direction: column; gap: 12px; }
+  .ps-header { display: flex; justify-content: space-between; align-items: center; }
+  .ps-bal-label { color: rgba(255,255,255,0.45); font-size: 10px; }
+  .ps-bal { color: #fff; font-size: 24px; font-weight: 800; font-family: 'Montserrat',sans-serif; }
+  .ps-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+  .ps-card { background: linear-gradient(135deg, #00A86B, #2F80ED); border-radius: 18px; padding: 16px; }
+  .ps-card-label { color: rgba(255,255,255,0.6); font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .ps-card-num { color: #fff; font-size: 12px; font-weight: 600; margin-top: 6px; letter-spacing: 2px; }
+  .ps-actions { display: flex; gap: 8px; }
+  .ps-action { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 4px; text-align: center; color: rgba(255,255,255,0.7); font-size: 9px; }
+  .ps-action-icon { font-size: 16px; display: block; margin-bottom: 4px; }
+  .ps-tx { display: flex; flex-direction: column; gap: 7px; }
+  .ps-tx-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.04); border-radius: 10px; padding: 9px 11px; }
+  .ps-tx-name { color: rgba(255,255,255,0.82); font-size: 10px; font-weight: 500; }
+  .ps-tx-sub { color: rgba(255,255,255,0.32); font-size: 8px; }
+  .ps-tx-amt { font-size: 11px; font-weight: 700; }
+  .green { color: #00D68F; } .red { color: #FF6B6B; }
+ 
+  /* Currency chips */
+  .curr-chip {
+    position: absolute; background: rgba(255,255,255,0.13); backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.22); border-radius: 100px; padding: 8px 16px;
+    color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 7px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.22); white-space: nowrap;
+  }
+  .chip1 { top: 55px; left: -80px; animation: fc1 3.5s ease-in-out infinite; }
+  .chip2 { top: 190px; right: -90px; animation: fc2 4s ease-in-out infinite; }
+  .chip3 { bottom: 90px; left: -70px; animation: fc3 3.2s ease-in-out infinite; }
+  @keyframes fc1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-6px,-9px)} }
+  @keyframes fc2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(9px,-6px)} }
+  @keyframes fc3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-4px,9px)} }
+ 
+  /* GENERIC SECTION */
+  section { padding: 100px 60px; }
+  .section-tag {
+    display: inline-block; background: rgba(0,168,107,0.09); color: var(--primary);
+    padding: 5px 14px; border-radius: 100px; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .section-title { font-family: 'Montserrat', sans-serif; font-size: clamp(28px, 4vw, 46px); font-weight: 800; letter-spacing: -1px; color: var(--text); margin-bottom: 14px; line-height: 1.1; }
+  .section-sub { color: var(--muted); font-size: 17px; line-height: 1.6; max-width: 520px; margin-bottom: 60px; }
+ 
+  /* FEATURES */
+  .features { background: #fff; }
+  .feat-header { text-align: center; }
+  .feat-header .section-sub { margin: 0 auto 60px; }
+  .features-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; }
+  .feat-card {
+    background: var(--bg); border-radius: 22px; padding: 32px 24px;
+    border: 1px solid rgba(0,168,107,0.08); transition: all .3s; cursor: default; position: relative; overflow: hidden;
+  }
+  .feat-card::after {
+    content:''; position: absolute; bottom:0; left:0; right:0; height:3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    transform: scaleX(0); transform-origin: left; transition: transform .3s;
+  }
+  .feat-card:hover { transform: translateY(-7px); box-shadow: 0 20px 44px rgba(0,168,107,0.12); background: #fff; }
+  .feat-card:hover::after { transform: scaleX(1); }
+  .feat-icon { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg,var(--primary),var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,168,107,0.28); }
+  .feat-title { font-family: 'Montserrat',sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+  .feat-desc { color: var(--muted); font-size: 14px; line-height: 1.65; }
+ 
+  /* HOW IT WORKS */
+  .how { background: var(--bg); }
+  .how-header { text-align: center; }
+  .how-header .section-sub { margin: 0 auto 60px; }
+  .how-steps { display: flex; align-items: flex-start; position: relative; }
+  .how-steps::before {
+    content:''; position: absolute;
+    top: 36px; left: calc(12.5% + 36px); right: calc(12.5% + 36px);
+    height: 2px; background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary)); z-index: 0;
+  }
+  .how-step { flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; padding: 0 12px; position:relative; z-index:1; }
+  .step-num {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(0,168,107,0.32); border: 4px solid var(--bg);
+  }
+  .step-title { font-family: 'Montserrat',sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .step-desc { color: var(--muted); font-size: 14px; line-height: 1.55; }
+ 
+  /* APP PREVIEW */
+  .app-preview {
+    background: linear-gradient(135deg, #0A2540 0%, #00A86B 65%, #0f3460 100%);
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .app-preview::before {
+    content:''; position: absolute; top:-200px; left:50%; transform:translateX(-50%);
+    width:800px; height:800px; border-radius:50%;
+    background: radial-gradient(ellipse, rgba(0,196,116,0.18) 0%, transparent 70%);
+  }
+  .app-preview .section-title { color: #fff; }
+  .app-preview .section-sub { color: rgba(255,255,255,0.65); margin: 0 auto 60px; }
+  .phones-row { display: flex; justify-content: center; align-items: flex-end; gap: 20px; position: relative; z-index: 1; }
+  .showcase-phone { border-radius: 28px; overflow: hidden; border: 2px solid rgba(255,255,255,0.14); box-shadow: 0 30px 64px rgba(0,0,0,0.42); }
+  .sp-main { width: 200px; height: 400px; background: linear-gradient(160deg,#111827,#1a2f4b); }
+  .sp-side { width: 162px; height: 320px; background: linear-gradient(160deg,#0d1f35,#15294a); opacity: 0.85; margin-bottom: 40px; }
+  .sp-inner { padding: 18px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .sp-label { color: rgba(255,255,255,0.4); font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .sp-bignum { color:#fff; font-size:28px; font-weight:800; font-family:'Montserrat',sans-serif; }
+  .sp-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .sp-btn { background:rgba(255,255,255,0.07); border-radius:11px; padding:10px 6px; text-align:center; color:rgba(255,255,255,0.75); font-size:8px; }
+  .sp-icon { font-size:14px; display:block; margin-bottom:3px; }
+  .sp-row { display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); border-radius:9px; padding:8px 10px; }
+  .sp-rname { color:rgba(255,255,255,0.82); font-size:9px; font-weight:500; }
+  .sp-rsub { color:rgba(255,255,255,0.3); font-size:7px; }
+  .sp-ramt { font-size:10px; font-weight:700; }
+ 
+  /* TRUST SECTION */
+  .trust-section { background: linear-gradient(135deg,#071929,#0A2540); display:flex; align-items:center; gap:80px; }
+  .trust-left { flex:1; }
+  .trust-left .section-tag { background:rgba(0,196,116,0.15); color:var(--accent); }
+  .trust-left .section-title { color:#fff; }
+  .trust-points { display:flex; flex-direction:column; gap:18px; margin-bottom:36px; }
+  .trust-point { display:flex; align-items:flex-start; gap:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:18px 20px; transition:background .2s; }
+  .trust-point:hover { background:rgba(0,196,116,0.07); }
+  .trust-pt-icon { width:40px; height:40px; border-radius:12px; background:rgba(0,196,116,0.15); border:1px solid rgba(0,196,116,0.3); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .trust-pt-title { color:#fff; font-weight:600; font-size:15px; margin-bottom:4px; }
+  .trust-pt-desc { color:rgba(255,255,255,0.42); font-size:13px; line-height:1.5; }
+  .trust-badge { display:inline-flex; align-items:center; gap:10px; background:rgba(0,196,116,0.12); border:1px solid rgba(0,196,116,0.25); color:var(--accent); padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600; }
+  .trust-right { flex:1; display:flex; justify-content:center; }
+  .shield-vis { width:280px; height:280px; position:relative; display:flex; align-items:center; justify-content:center; }
+  .s-ring { position:absolute; border-radius:50%; border:1px solid rgba(0,196,116,0.22); animation:rp 3s ease-in-out infinite; }
+  .r1 { width:280px; height:280px; animation-delay:0s; }
+  .r2 { width:210px; height:210px; animation-delay:0.5s; }
+  .r3 { width:140px; height:140px; animation-delay:1s; }
+  @keyframes rp { 0%,100%{opacity:0.2;transform:scale(1)} 50%{opacity:0.52;transform:scale(1.04)} }
+  .shield-center { width:100px; height:100px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--accent)); display:flex; align-items:center; justify-content:center; font-size:44px; box-shadow:0 0 60px rgba(0,196,116,0.42); position:relative; z-index:2; }
+ 
+  /* TESTIMONIALS */
+  .testimonials { background:#fff; }
+  .testi-header { text-align:center; }
+  .testi-header .section-sub { margin: 0 auto 60px; }
+  .testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+  .testi-card { background:var(--bg); border-radius:22px; padding:32px; border:1px solid rgba(0,168,107,0.07); transition:all .3s; }
+  .testi-card:hover { transform:translateY(-5px); box-shadow:0 16px 44px rgba(0,168,107,0.11); }
+  .testi-stars { color:#FFB800; font-size:16px; margin-bottom:16px; letter-spacing:2px; }
+  .testi-quote { color:var(--text); font-size:15px; line-height:1.7; margin-bottom:24px; font-style:italic; }
+  .testi-user { display:flex; align-items:center; gap:12px; }
+  .testi-av { width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#fff; }
+  .testi-name { font-weight:700; font-size:14px; }
+  .testi-loc { color:var(--muted); font-size:12px; }
+ 
+  /* CTA */
+  .cta-section { background:linear-gradient(135deg,#00A86B,#0d3a6b,#2F80ED); text-align:center; position:relative; overflow:hidden; }
+  .cta-section::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:600px; height:600px; border-radius:50%; background:radial-gradient(ellipse,rgba(0,196,116,0.22) 0%,transparent 70%); }
+  .cta-section .section-title { color:#fff; position:relative; z-index:1; }
+  .cta-section .section-sub { color:rgba(255,255,255,0.7); margin:0 auto 40px; position:relative; z-index:1; }
+  .cta-btns { display:flex; justify-content:center; gap:16px; flex-wrap:wrap; position:relative; z-index:1; }
+ 
+  /* FOOTER */
+  footer { background:#071929; padding:70px 60px 0; }
+  .footer-grid { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:50px; margin-bottom:60px; }
+  .f-logo { font-family:'Montserrat',sans-serif; font-size:24px; font-weight:800; color:#fff; display:block; margin-bottom:16px; }
+  .f-logo span { color:var(--accent); }
+  .f-tagline { color:rgba(255,255,255,0.42); font-size:14px; line-height:1.65; margin-bottom:24px; }
+  .socials { display:flex; gap:10px; }
+  .soc { width:38px; height:38px; border-radius:10px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.55); font-size:13px; text-decoration:none; transition:all .2s; font-weight:700; }
+  .soc:hover { background:rgba(0,196,116,0.2); color:var(--accent); border-color:rgba(0,196,116,0.3); }
+  .f-col h4 { font-family:'Montserrat',sans-serif; font-size:14px; font-weight:700; color:#fff; margin-bottom:20px; }
+  .f-links { list-style:none; display:flex; flex-direction:column; gap:12px; }
+  .f-links a { color:rgba(255,255,255,0.42); font-size:14px; text-decoration:none; transition:color .2s; }
+  .f-links a:hover { color:var(--accent); }
+  .footer-bar { border-top:1px solid rgba(255,255,255,0.07); padding:24px 0; display:flex; justify-content:space-between; align-items:center; color:rgba(255,255,255,0.3); font-size:13px; }
+  .fb-links { display:flex; gap:24px; }
+  .fb-links a { color:rgba(255,255,255,0.3); text-decoration:none; font-size:13px; transition:color .2s; }
+  .fb-links a:hover { color:rgba(255,255,255,0.7); }
+ 
+  /* Animate */
+  .fade-up { opacity:0; transform:translateY(32px); transition:opacity 0.7s ease, transform 0.7s ease; }
+  .fade-up.visible { opacity:1; transform:translateY(0); }
+</style>
+</head>
+<body>
+ 
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#" aria-label="RemitPay">
+    <span class="nav-logo-mark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><ellipse cx="12" cy="12" rx="4" ry="9"/></svg>
+    </span>
+    <span class="nav-logo-text">Remit<span>Pay</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">Features</a></li>
+    <li><a href="#">How It Works</a></li>
+    <li><a href="#">Security</a></li>
+    <li><a href="#">Pricing</a></li>
+  </ul>
+  <button class="nav-cta">Get Started</button>
+</nav>
+ 
+<!-- 1. HERO -->
+<section class="hero">
+  <div class="hero-dots"></div>
+  <div class="hero-orb"></div>
+ 
+  <div class="hero-left fade-up">
+    <div class="hero-badge"><div class="pulse"></div>Global Payments Platform</div>
+    <h1>Send Money <em>Globally.</em><br>Instantly. Securely.</h1>
+    <p class="hero-sub">Zoober Pay Wallet lets you transfer money across borders, manage multiple currencies, and track transactions in real-time.</p>
+    <div class="hero-btns">
+      <button class="btn-primary">Get Started →</button>
+      <button class="btn-outline">⬇ Download App</button>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-avatars">
+        <span>AK</span><span>MR</span><span>JL</span><span>SP</span>
+      </div>
+      <span>Trusted by <strong style="color:#fff">50,000+</strong> users worldwide</span>
+    </div>
+  </div>
+ 
+  <div class="hero-right fade-up">
+    <div class="phone-wrap">
+      <div class="phone-glow"></div>
+      <div class="curr-chip chip1">🇺🇸 USD 1,240.00</div>
+      <div class="curr-chip chip2">🇪🇺 EUR 980.50</div>
+      <div class="curr-chip chip3">🇧🇩 BDT 85,000</div>
+      <div class="phone-body">
+        <div class="phone-screen">
+          <div class="ps-header">
+            <div>
+              <div class="ps-bal-label">Total Balance</div>
+              <div class="ps-bal">$4,820.00</div>
+            </div>
+            <div class="ps-dot"></div>
+          </div>
+          <div class="ps-card">
+            <div class="ps-card-label">Zoober Pay Wallet</div>
+            <div class="ps-card-num">•••• •••• •••• 8421</div>
+          </div>
+          <div class="ps-actions">
+            <div class="ps-action"><span class="ps-action-icon">📤</span>Send</div>
+            <div class="ps-action"><span class="ps-action-icon">📥</span>Receive</div>
+            <div class="ps-action"><span class="ps-action-icon">💱</span>Convert</div>
+          </div>
+          <div class="ps-tx">
+            <div class="ps-tx-row">
+              <div>
+                <div class="ps-tx-name">Transfer to UK</div>
+                <div class="ps-tx-sub">Today, 2:34 PM</div>
+              </div>
+              <div class="ps-tx-amt red">- $120.00</div>
+            </div>
+            <div class="ps-tx-row">
+              <div>
+                <div class="ps-tx-name">Received USD</div>
+                <div class="ps-tx-sub">Yesterday</div>
+              </div>
+              <div class="ps-tx-amt green">+ $540.00</div>
+            </div>
+            <div class="ps-tx-row">
+              <div>
+                <div class="ps-tx-name">EUR Converted</div>
+                <div class="ps-tx-sub">Apr 18</div>
+              </div>
+              <div class="ps-tx-amt green">+ €200.00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- 2. FEATURES -->
+<section class="features">
+  <div class="feat-header fade-up">
+    <div class="section-tag">Features</div>
+    <div class="section-title">Everything You Need<br>in One Wallet</div>
+    <p class="section-sub">Built for speed, security, and global reach — one app for all your cross-border payment needs.</p>
+  </div>
+  <div class="features-grid fade-up">
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">Instant Transfers</div>
+      <p class="feat-desc">Send money anywhere in seconds with real-time processing and live confirmation.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">💱</div>
+      <div class="feat-title">Multi-Currency Wallet</div>
+      <p class="feat-desc">Hold and manage USD, EUR, BDT and more — all in one powerful wallet.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔒</div>
+      <div class="feat-title">Secure Transactions</div>
+      <p class="feat-desc">Advanced encryption and intelligent fraud protection keeps your money safe 24/7.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">💸</div>
+      <div class="feat-title">Low Fees</div>
+      <p class="feat-desc">Transparent pricing with no hidden charges. You always know exactly what you pay.</p>
+    </div>
+  </div>
+</section>
+ 
+<!-- 3. HOW IT WORKS -->
+<section class="how">
+  <div class="how-header fade-up">
+    <div class="section-tag">Process</div>
+    <div class="section-title">How It Works</div>
+    <p class="section-sub">Four simple steps to seamless global money transfers. Get started in minutes.</p>
+  </div>
+  <div class="how-steps fade-up">
+    <div class="how-step">
+      <div class="step-num">👤</div>
+      <div class="step-title">Create Account</div>
+      <p class="step-desc">Sign up in minutes with secure identity verification.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">💳</div>
+      <div class="step-title">Add Funds</div>
+      <p class="step-desc">Deposit via card, bank transfer, or mobile banking.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">📤</div>
+      <div class="step-title">Send Money</div>
+      <p class="step-desc">Choose your recipient and send instantly worldwide.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">📊</div>
+      <div class="step-title">Track Transfers</div>
+      <p class="step-desc">Monitor every transaction in real-time with live updates.</p>
+    </div>
+  </div>
+</section>
+ 
+<!-- 4. APP PREVIEW -->
+<section class="app-preview">
+  <div class="section-tag" style="background:rgba(0,196,116,0.15);color:#00C474;">App Preview</div>
+  <div class="section-title fade-up">Experience Seamless Banking</div>
+  <p class="section-sub fade-up">Designed for speed, simplicity, and global access.</p>
+ 
+  <div class="phones-row fade-up">
+    <!-- Left side phone: Send Money -->
+    <div class="showcase-phone sp-side">
+      <div class="sp-inner">
+        <div class="sp-label">Send Money</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:8px;">
+          <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:10px;color:rgba(255,255,255,0.65);font-size:9px;">🌍 Select Country</div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:10px;color:rgba(255,255,255,0.65);font-size:9px;">👤 Recipient Name</div>
+          <div style="background:rgba(0,196,116,0.15);border:1px solid rgba(0,196,116,0.3);border-radius:10px;padding:10px;text-align:center;color:#00C474;font-size:11px;font-weight:700;">$250.00</div>
+          <div style="background:linear-gradient(135deg,#00A86B,#00C474);border-radius:10px;padding:10px;text-align:center;color:#fff;font-size:10px;font-weight:700;">Send Now →</div>
+          <div style="text-align:center;color:rgba(255,255,255,0.3);font-size:8px;">Fee: $0.99 · ETA: Instant</div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Center main phone: Dashboard -->
+    <div class="showcase-phone sp-main">
+      <div class="sp-inner">
+        <div class="sp-label">Dashboard</div>
+        <div class="sp-bignum">$4,820.00</div>
+        <div style="color:rgba(255,255,255,0.38);font-size:9px;margin-bottom:8px;">Available Balance</div>
+        <div class="sp-grid">
+          <div class="sp-btn"><span class="sp-icon">📤</span>Send</div>
+          <div class="sp-btn"><span class="sp-icon">📥</span>Receive</div>
+          <div class="sp-btn"><span class="sp-icon">💱</span>Convert</div>
+          <div class="sp-btn"><span class="sp-icon">📋</span>History</div>
+        </div>
+        <div style="color:rgba(255,255,255,0.35);font-size:8px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Recent</div>
+        <div class="sp-row">
+          <div style="display:flex;align-items:center;gap:7px;">
+            <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2F80ED,#00C474);display:flex;align-items:center;justify-content:center;font-size:9px;">🇬🇧</div>
+            <div><div class="sp-rname">UK Transfer</div><div class="sp-rsub">Today</div></div>
+          </div>
+          <div class="sp-ramt red">-$120</div>
+        </div>
+        <div class="sp-row">
+          <div style="display:flex;align-items:center;gap:7px;">
+            <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#00b894,#00C474);display:flex;align-items:center;justify-content:center;font-size:9px;">🇺🇸</div>
+            <div><div class="sp-rname">USD In</div><div class="sp-rsub">Yesterday</div></div>
+          </div>
+          <div class="sp-ramt green">+$540</div>
+        </div>
+        <div class="sp-row">
+          <div style="display:flex;align-items:center;gap:7px;">
+            <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#fdcb6e,#e17055);display:flex;align-items:center;justify-content:center;font-size:9px;">🇪🇺</div>
+            <div><div class="sp-rname">EUR Wallet</div><div class="sp-rsub">Apr 18</div></div>
+          </div>
+          <div class="sp-ramt green">+€200</div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Right side phone: Transaction History -->
+    <div class="showcase-phone sp-side">
+      <div class="sp-inner">
+        <div class="sp-label">This Month</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:8px;">
+          <div class="sp-row"><span style="color:rgba(255,255,255,0.65);font-size:9px;">Total Sent</span><span class="sp-ramt red">-$842</span></div>
+          <div class="sp-row"><span style="color:rgba(255,255,255,0.65);font-size:9px;">Total Received</span><span class="sp-ramt green">+$2,140</span></div>
+          <div style="height:64px;background:rgba(0,196,116,0.07);border-radius:10px;display:flex;align-items:flex-end;padding:8px;gap:5px;">
+            <div style="flex:1;background:rgba(0,196,116,0.3);border-radius:3px;height:30%"></div>
+            <div style="flex:1;background:rgba(0,196,116,0.3);border-radius:3px;height:55%"></div>
+            <div style="flex:1;background:rgba(0,196,116,0.55);border-radius:3px;height:42%"></div>
+            <div style="flex:1;background:#00C474;border-radius:3px;height:78%"></div>
+            <div style="flex:1;background:rgba(0,196,116,0.3);border-radius:3px;height:48%"></div>
+          </div>
+          <div style="color:rgba(255,255,255,0.3);font-size:8px;text-align:center;">Apr 14–20, 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- 5. SECURITY / TRUST -->
+<section class="trust-section">
+  <div class="trust-left fade-up">
+    <div class="section-tag">Security</div>
+    <div class="section-title">Your Security is<br>Our Priority</div>
+    <div class="trust-points">
+      <div class="trust-point">
+        <div class="trust-pt-icon">🔐</div>
+        <div>
+          <div class="trust-pt-title">End-to-End Encryption</div>
+          <p class="trust-pt-desc">Every transaction is protected with military-grade 256-bit AES encryption.</p>
+        </div>
+      </div>
+      <div class="trust-point">
+        <div class="trust-pt-icon">📱</div>
+        <div>
+          <div class="trust-pt-title">Two-Factor Authentication</div>
+          <p class="trust-pt-desc">Multiple verification layers ensure only you can access your account.</p>
+        </div>
+      </div>
+      <div class="trust-point">
+        <div class="trust-pt-icon">🛡️</div>
+        <div>
+          <div class="trust-pt-title">Real-Time Fraud Monitoring</div>
+          <p class="trust-pt-desc">AI-powered detection monitors every transaction around the clock.</p>
+        </div>
+      </div>
+    </div>
+    <div class="trust-badge">✅ Certified & Compliant with global financial standards</div>
+  </div>
+  <div class="trust-right fade-up">
+    <div class="shield-vis">
+      <div class="s-ring r1"></div>
+      <div class="s-ring r2"></div>
+      <div class="s-ring r3"></div>
+      <div class="shield-center">🛡️</div>
+    </div>
+  </div>
+</section>
+ 
+<!-- 6. TESTIMONIALS -->
+<section class="testimonials">
+  <div class="testi-header fade-up">
+    <div class="section-tag">Testimonials</div>
+    <div class="section-title">What Our Users Say</div>
+    <p class="section-sub">Join thousands of satisfied customers trusting Zoober Pay worldwide.</p>
+  </div>
+  <div class="testi-grid fade-up">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"Fastest remittance app I've ever used. Super smooth experience and transfers arrive instantly."</p>
+      <div class="testi-user">
+        <div class="testi-av">AR</div>
+        <div>
+          <div class="testi-name">Ahmed Rahman</div>
+          <div class="testi-loc">🇧🇩 Bangladesh</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"The multi-currency wallet is a game changer. Perfect for freelancers working with international clients."</p>
+      <div class="testi-user">
+        <div class="testi-av">SL</div>
+        <div>
+          <div class="testi-name">Sarah Lin</div>
+          <div class="testi-loc">🇬🇧 United Kingdom</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"Secure and reliable. The fee transparency alone sets Zoober Pay apart. Highly recommended."</p>
+      <div class="testi-user">
+        <div class="testi-av">MK</div>
+        <div>
+          <div class="testi-name">Mark Kowalski</div>
+          <div class="testi-loc">🇺🇸 United States</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- 7. CTA -->
+<section class="cta-section">
+  <div class="section-tag" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);">Get Started Today</div>
+  <div class="section-title fade-up">Start Sending Money Today</div>
+  <p class="section-sub fade-up">Join thousands of users using Zoober Pay worldwide.</p>
+  <div class="cta-btns fade-up">
+    <button class="btn-primary">Get Started →</button>
+    <button class="btn-outline">⬇ Download App</button>
+  </div>
+</section>
+ 
+<!-- 8. FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <span class="f-logo">Remit<span>Pay</span></span>
+      <p class="f-tagline">Global payments made simple. Send, receive, and manage money across borders with confidence.</p>
+      <div class="socials">
+        <a class="soc" href="#">f</a>
+        <a class="soc" href="#">in</a>
+        <a class="soc" href="#">𝕏</a>
+      </div>
+    </div>
+    <div class="f-col">
+      <h4>Product</h4>
+      <ul class="f-links">
+        <li><a href="#">Features</a></li>
+        <li><a href="#">Pricing</a></li>
+        <li><a href="#">Security</a></li>
+        <li><a href="#">API</a></li>
+      </ul>
+    </div>
+    <div class="f-col">
+      <h4>Company</h4>
+      <ul class="f-links">
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="f-col">
+      <h4>Support</h4>
+      <ul class="f-links">
+        <li><a href="#">Help Center</a></li>
+        <li><a href="#">FAQs</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <span>© 2026 Zoober Pay. All rights reserved.</span>
+    <div class="fb-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Cookies</a>
+    </div>
+  </div>
+</footer>
+ 
+<script>
+  const fadeEls = document.querySelectorAll('.fade-up');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 80); }
+    });
+  }, { threshold: 0.1 });
+  fadeEls.forEach(el => obs.observe(el));
+  document.querySelectorAll('.hero .fade-up').forEach((el, i) => {
+    setTimeout(() => el.classList.add('visible'), 300 + i * 180);
+  });
+</script>
+</body>
+</html>
+ 

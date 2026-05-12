@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>/* auth guard — redirect before rendering if not signed in */(function(){var k='remitpay.auth';if(!(localStorage.getItem(k)||sessionStorage.getItem(k)))location.replace('login.html');})();</script>
+<title>Remittance Pay — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-primary: #00A86B;
+    --brand-primary-pressed: #008454;
+    --brand-secondary: #2F80ED;
+    --brand-accent: #00C474;
+    --success-base: #00A371;
+    --success-bg: #E6F7F1;
+    --warning-base: #E89B00;
+    --warning-bg: #FFF6E5;
+    --error-base: #D7263D;
+    --text-primary: #0A2540;
+    --text-secondary: #6B8299;
+    --text-muted: #9AAEC1;
+    --text-inverse: #FFFFFF;
+    --surface-page: #F4F8FC;
+    --surface-card: #FFFFFF;
+    --surface-raised: #FAFCFE;
+    --border-subtle: #E5EDF5;
+    --border-strong: #C3D2E0;
+    --elev-1: 0 1px 2px rgba(10,37,64,0.06);
+    --elev-2: 0 4px 12px rgba(10,37,64,0.08);
+    --elev-3: 0 12px 32px rgba(10,37,64,0.14);
+    --ease-std: cubic-bezier(0.2, 0, 0, 1);
+    --dur-fast: 160ms;
+    --dur-base: 240ms;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Poppins', system-ui, sans-serif;
+    background: var(--surface-page);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ============ APP SHELL ============ */
+  .app {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    background: var(--surface-card);
+    border-right: 1px solid var(--border-subtle);
+    padding: 24px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 12px 24px;
+    text-decoration: none; color: inherit;
+    transition: opacity var(--dur-fast) var(--ease-std);
+  }
+  .logo:hover { opacity: 0.85; }
+  .logo:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 4px; border-radius: 4px; }
+  .logo-mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 16px;
+  }
+  .logo-text {
+    font-family: 'Poppins', Poppins; font-weight: 800; font-size: 18px;
+    color: var(--text-primary); letter-spacing: -0.3px;
+  }
+  .logo-text span { color: var(--brand-accent); }
+
+  .nav-section { margin-top: 8px; }
+  .nav-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.6px; color: var(--text-muted);
+    padding: 8px 12px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 8px;
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 14px; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-std);
+    cursor: pointer;
+  }
+  .nav-item:hover { background: var(--surface-page); color: var(--text-primary); }
+  .nav-item.active {
+    background: rgba(0,168,107,0.08); color: var(--brand-primary); font-weight: 600;
+  }
+  .nav-item .badge {
+    margin-left: auto; background: var(--brand-accent); color: #002a50;
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px;
+  }
+
+  .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
+  .upgrade-card {
+    background: linear-gradient(160deg, var(--brand-primary), var(--brand-primary-pressed));
+    border-radius: 12px; padding: 16px; color: #fff;
+  }
+  .upgrade-card h4 { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .upgrade-card p { font-size: 12px; opacity: 0.75; margin-bottom: 12px; line-height: 1.4; }
+  .upgrade-btn {
+    background: var(--brand-accent); color: var(--brand-primary-pressed);
+    border: none; padding: 8px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; width: 100%;
+  }
+
+  /* ============ MAIN AREA ============ */
+  .main { display: flex; flex-direction: column; min-width: 0; }
+
+  /* Top bar */
+  .topbar {
+    height: 64px;
+    background: var(--surface-card);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 16px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  /* .search {
+    flex: 1; max-width: 480px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface-page);
+    border: 1px solid transparent;
+    border-radius: 8px; padding: 9px 14px;
+    transition: border-color var(--dur-fast) var(--ease-std);
+  } */
+  /* .search:focus-within { border-color: var(--brand-primary); background: #fff; }
+  .search input {
+    flex: 1; border: none; background: transparent; outline: none;
+    font-family: inherit; font-size: 14px; color: var(--text-primary);
+  }
+  .search input::placeholder { color: var(--text-muted); }
+  .search kbd {
+    font-family: inherit; font-size: 11px; font-weight: 600;
+    color: var(--text-muted);
+    background: #fff; padding: 2px 6px; border-radius: 4px;
+    border: 1px solid var(--border-subtle);
+  } */
+  .topbar-spacer { flex: 1; }
+  .topbar-actions { display: flex; align-items: center; gap: 8px; }
+  .ico-btn {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: transparent; border: none;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary); position: relative;
+    transition: background var(--dur-fast) var(--ease-std);
+  }
+  .ico-btn:hover { background: var(--surface-page); color: var(--text-primary); }
+  .ico-btn .dot {
+    position: absolute; top: 9px; right: 10px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--brand-accent); border: 2px solid #fff;
+  }
+  .lang-switcher { position: relative; }
+  .lang-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px; border-radius: 8px;
+    background: transparent; border: 1px solid var(--border-subtle);
+    color: var(--text-secondary); font-size: 13px; font-weight: 600;
+    transition: background var(--dur-fast) var(--ease-std), border-color var(--dur-fast) var(--ease-std);
+  }
+  .lang-btn:hover { background: var(--surface-page); border-color: var(--border-strong); }
+  .lang-switcher.open .lang-btn { border-color: var(--brand-primary); color: var(--brand-primary); }
+  .lang-btn .chev { transition: transform var(--dur-fast) var(--ease-std); }
+  .lang-switcher.open .lang-btn .chev { transform: rotate(180deg); }
+  .lang-menu {
+    position: absolute; top: calc(100% + 6px); right: 0;
+    min-width: 180px; padding: 6px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    box-shadow: var(--elev-3);
+    list-style: none; margin: 0; z-index: 30;
+    opacity: 0; transform: translateY(-4px); pointer-events: none;
+    transition: opacity var(--dur-fast) var(--ease-std), transform var(--dur-fast) var(--ease-std);
+  }
+  .lang-switcher.open .lang-menu { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .lang-menu li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text-primary);
+    cursor: pointer; -webkit-user-select: none; user-select: none;
+    transition: background var(--dur-fast) var(--ease-std);
+  }
+  .lang-menu li:hover { background: var(--surface-page); }
+  .lang-menu li.active { color: var(--brand-primary); font-weight: 600; }
+  .lang-menu .lang-code {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.4px;
+    background: var(--surface-page); color: var(--text-secondary);
+    padding: 3px 7px; border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .lang-menu li.active .lang-code { background: var(--brand-primary); color: #fff; }
+  .lang-menu .check {
+    margin-left: auto; opacity: 0; color: var(--brand-primary);
+    transition: opacity var(--dur-fast) var(--ease-std);
+  }
+  .lang-menu li.active .check { opacity: 1; }
+  html[lang="bn"] body { font-family: 'Noto Sans Bengali', 'Poppins', system-ui, sans-serif; }
+  .user-menu {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 12px 6px 6px; border-radius: 999px;
+    background: var(--surface-page); border: none;
+    transition: background var(--dur-fast) var(--ease-std);
+  }
+  .user-menu:hover { background: var(--border-subtle); }
+  .user-av {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #FFB347, #FF7043);
+    color: #fff; font-weight: 700; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .user-info { text-align: left; line-height: 1.2; }
+  .user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .user-role { font-size: 11px; color: var(--text-secondary); }
+
+  /* ============ CONTENT ============ */
+  .content {
+    padding: 32px;
+    max-width: 1440px;
+    width: 100%;
+  }
+
+  /* Page header */
+  .page-head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 28px; gap: 24px; flex-wrap: wrap;
+  }
+  .page-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px; font-weight: 800;
+    letter-spacing: -0.5px; line-height: 1.1; margin-bottom: 6px;
+  }
+  .page-sub { font-size: 14px; color: var(--text-secondary); }
+  .page-actions { display: flex; gap: 10px; }
+  .btn {
+    height: 40px; padding: 0 18px;
+    border-radius: 8px; border: none;
+    font-size: 13px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all var(--dur-fast) var(--ease-std);
+  }
+  .btn-secondary {
+    background: var(--surface-card); color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+  }
+  .btn-secondary:hover { background: var(--surface-page); border-color: var(--border-strong); }
+  .btn-primary {
+    background: var(--brand-primary); color: #fff;
+    box-shadow: var(--elev-1);
+  }
+  .btn-primary:hover { background: var(--brand-primary-pressed); box-shadow: var(--elev-2); }
+
+  /* ============ TOTAL BALANCE SUMMARY ============ */
+  .balance-summary {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 24px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 18px;
+  }
+  .balance-main { display: flex; flex-direction: column; }
+  .balance-label {
+    font-size: 11px; font-weight: 700; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+  .balance-amount-row { display: flex; align-items: baseline; gap: 10px; }
+  .balance-amount {
+    font-family: 'Poppins', sans-serif;
+    font-size: 32px; font-weight: 800; line-height: 1.1;
+    letter-spacing: -0.6px; color: var(--text-primary);
+    font-feature-settings: "tnum";
+  }
+  .balance-amount-curr {
+    font-size: 14px; font-weight: 700; color: var(--text-secondary);
+    letter-spacing: 0.3px;
+  }
+  .balance-breakdown {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .balance-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 999px;
+    background: var(--surface-page); border: 1px solid var(--border-subtle);
+    font-size: 12px; font-weight: 600; color: var(--text-primary);
+    font-feature-settings: "tnum";
+  }
+  .balance-pill .pill-curr { color: var(--text-secondary); font-weight: 700; letter-spacing: 0.3px; }
+
+  /* ============ KPI ROW ============ */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative; overflow: hidden;
+  }
+  .kpi-wallet { text-align: center; }
+  .kpi-flag {
+    width: 44px; height: 44px; border-radius: 50%;
+    margin: 0 auto 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    background: #fff;
+  }
+  .kpi-flag svg { display: block; width: 100%; height: 100%; }
+  .kpi-label {
+    font-size: 12px; font-weight: 600; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.4px;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .kpi-icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: rgba(0,168,107,0.08); color: var(--brand-primary);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .kpi-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px; font-weight: 800; line-height: 1.1;
+    letter-spacing: -0.5px; font-feature-settings: "tnum";
+    margin-bottom: 8px;
+  }
+  .kpi-delta {
+    font-size: 12px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .delta-up { color: var(--success-base); }
+  .delta-down { color: var(--error-base); }
+  .delta-flat { color: var(--text-secondary); }
+  .kpi-spark {
+    position: absolute; bottom: 0; right: 0; opacity: 0.65;
+  }
+
+  /* ============ TWO-COLUMN GRID ============ */
+  .grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 1180px) { .grid { grid-template-columns: 1fr; } }
+  .col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+  /* Generic card */
+  .card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 20px 20px 0;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px; gap: 16px;
+  }
+  .card-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px; font-weight: 700;
+    letter-spacing: -0.2px;
+  }
+  .card-body { padding: 0 20px 20px; }
+  .card-link { font-size: 13px; font-weight: 600; color: var(--brand-primary); text-decoration: none; }
+
+  /* Tabs (chart range) */
+  .tabs {
+    display: inline-flex; gap: 2px; padding: 3px;
+    background: var(--surface-page); border-radius: 8px;
+  }
+  .tab-btn {
+    padding: 6px 12px; border-radius: 6px;
+    background: transparent; border: none;
+    font-size: 12px; font-weight: 600; color: var(--text-secondary);
+    transition: all var(--dur-fast) var(--ease-std);
+  }
+  .tab-btn.active { background: #fff; color: var(--brand-primary); box-shadow: var(--elev-1); }
+
+  /* ============ CHART ============ */
+  .chart-wrap { padding: 0 20px 8px; }
+  .chart-meta { display: flex; gap: 24px; margin-bottom: 12px; }
+  .chart-legend {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .chart svg { width: 100%; height: auto; display: block; cursor: crosshair; }
+  .chart-hover { opacity: 0; transition: opacity 200ms var(--ease-std); pointer-events: none; }
+  .chart-hover.show { opacity: 1; }
+  .chart-guide { transition: x1 220ms var(--ease-std), x2 220ms var(--ease-std); }
+  .hover-dot-sent, .hover-dot-recv {
+    transition: cx 220ms var(--ease-std), cy 220ms var(--ease-std);
+    filter: drop-shadow(0 1px 3px rgba(10, 37, 64, 0.25));
+  }
+  .hover-tooltip { transition: transform 220ms var(--ease-std); }
+  .chart-month-label { transition: fill 200ms var(--ease-std), font-weight 200ms var(--ease-std); }
+  .chart-month-label.active { fill: var(--brand-primary); font-weight: 700; }
+
+  /* ============ ACTIVITY TABLE ============ */
+  table {
+    width: 100%; border-collapse: collapse;
+  }
+  thead th {
+    text-align: left; font-size: 11px; font-weight: 700;
+    color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 10px 16px; background: var(--surface-page);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  tbody td {
+    padding: 14px 16px; font-size: 13px;
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: middle;
+  }
+  tbody tr { transition: background var(--dur-fast) var(--ease-std); cursor: pointer; }
+  tbody tr:hover { background: var(--surface-raised); }
+  tbody tr:last-child td { border-bottom: none; }
+  .recipient-cell { display: flex; align-items: center; gap: 10px; }
+  .row-av-sm {
+    width: 32px; height: 32px; border-radius: 50%;
+    color: #fff; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .recipient-name { font-weight: 600; color: var(--text-primary); }
+  .recipient-meta { font-size: 11px; color: var(--text-secondary); }
+  .amt { font-weight: 700; font-feature-settings: "tnum"; color: var(--text-primary); }
+  .amt-sub { font-size: 11px; color: var(--text-secondary); font-feature-settings: "tnum"; }
+  .status-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 8px; border-radius: 999px;
+  }
+  .status-success { background: var(--success-bg); color: var(--success-base); }
+  .status-warn { background: var(--warning-bg); color: var(--warning-base); }
+  .status-pending { background: rgba(0,168,107,0.08); color: var(--brand-primary); }
+
+  /* Avatar gradients */
+  .av-1 { background: linear-gradient(135deg, #F472B6, #DB2777); }
+  .av-2 { background: linear-gradient(135deg, #60A5FA, #2563EB); }
+  .av-3 { background: linear-gradient(135deg, #34D399, #059669); }
+  .av-4 { background: linear-gradient(135deg, #FBBF24, #D97706); }
+  .av-5 { background: linear-gradient(135deg, #A78BFA, #7C3AED); }
+  .av-6 { background: linear-gradient(135deg, #FB7185, #E11D48); }
+
+  /* ============ QUICK SEND CARD ============ */
+  .quick-send {
+    background: linear-gradient(160deg, var(--brand-primary) 0%, var(--brand-primary-pressed) 100%);
+    color: #fff; border-radius: 12px;
+    padding: 24px; position: relative; overflow: hidden;
+  }
+  .quick-send::after {
+    content: ''; position: absolute; right: -60px; top: -60px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,196,116,0.2), transparent 70%);
+  }
+  .qs-label { font-size: 12px; opacity: 0.7; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .qs-input {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px; padding: 14px 16px;
+    margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative; z-index: 1;
+  }
+  .qs-amount {
+    font-family: 'Poppins', sans-serif; font-weight: 800;
+    font-size: 26px; background: transparent; border: none;
+    color: #fff; outline: none; width: 60%;
+    font-feature-settings: "tnum";
+  }
+  .qs-amount::placeholder { color: rgba(255,255,255,0.4); }
+  .qs-curr {
+    background: rgba(255,255,255,0.95); color: var(--brand-primary);
+    padding: 6px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+  }
+  .qs-curr-select {
+    -webkit-appearance: none; -moz-appearance: none; appearance: none;
+    background: rgba(255,255,255,0.95)
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2301559D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>")
+      no-repeat right 9px center;
+    color: var(--brand-primary);
+    padding: 6px 24px 6px 12px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+    border: none; outline: none; cursor: pointer;
+    font-family: inherit; letter-spacing: 0.2px;
+    transition: background-color var(--dur-fast) var(--ease-std);
+  }
+  .qs-curr-select:hover { background-color: #fff; }
+  .qs-curr-select:focus-visible { box-shadow: 0 0 0 3px rgba(0,196,116,0.45); }
+  .qs-curr-select option { color: var(--text-primary); background: #fff; font-weight: 600; }
+  .qs-arrow {
+    text-align: center; font-size: 16px; color: rgba(255,255,255,0.5);
+    margin: -4px 0;
+  }
+  .qs-rate-line {
+    font-size: 12px; opacity: 0.8; margin-top: 14px;
+    display: flex; justify-content: space-between;
+    position: relative; z-index: 1;
+  }
+  .qs-cta {
+    width: 100%; margin-top: 16px;
+    background: var(--surface-card); color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+    padding: 12px;
+    border-radius: 10px; font-weight: 700; font-size: 14px;
+    position: relative; z-index: 1;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-std), border-color var(--dur-fast) var(--ease-std);
+  }
+  .qs-cta:hover:not(:disabled) { background: var(--surface-page); border-color: var(--border-strong); }
+  .qs-cta:disabled { cursor: not-allowed; }
+
+  /* ============ FX MULTI ============ */
+  .fx-list { display: flex; flex-direction: column; gap: 12px; padding: 0 20px 20px; }
+  .fx-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px dashed var(--border-subtle);
+  }
+  .fx-row:last-child { border-bottom: none; }
+  .fx-pair { display: flex; align-items: center; gap: 10px; }
+  .fx-flag {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--surface-page); color: var(--text-primary);
+    font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-subtle);
+  }
+  .fx-pair-name { font-size: 13px; font-weight: 600; }
+  .fx-pair-sub { font-size: 11px; color: var(--text-secondary); }
+  .fx-rate-val { font-size: 14px; font-weight: 700; font-feature-settings: "tnum"; }
+  .fx-trend { font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px; }
+
+  /* ============ IN-FLIGHT ============ */
+  .inflight-card { padding: 20px; }
+  .inflight-head {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+  }
+  .inflight-av-lg {
+    width: 44px; height: 44px; border-radius: 50%;
+    color: #fff; font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .inflight-name-lg { font-size: 15px; font-weight: 700; }
+  .inflight-corridor { font-size: 12px; color: var(--text-secondary); }
+  .inflight-amt-lg {
+    margin-left: auto;
+    font-family: 'Poppins', sans-serif; font-weight: 800;
+    font-size: 18px; font-feature-settings: "tnum";
+  }
+  .timeline {
+    display: flex; align-items: center;
+    margin: 12px 0;
+  }
+  .tl-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; }
+  .tl-dot {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface-page);
+    border: 2px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+    z-index: 1;
+  }
+  .tl-step.done .tl-dot { background: var(--success-base); border-color: var(--success-base); color: #fff; }
+  .tl-step.active .tl-dot {
+    background: var(--brand-primary); border-color: var(--brand-primary); color: #fff;
+    box-shadow: 0 0 0 4px rgba(0,168,107,0.15);
+  }
+  .tl-line {
+    flex: 0 0 auto; height: 2px; width: 100%;
+    background: var(--border-subtle);
+    position: relative; top: 11px; margin: 0 -8px;
+  }
+  .tl-line.done { background: var(--success-base); }
+  .tl-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+  .tl-step.active .tl-label, .tl-step.done .tl-label { color: var(--text-primary); }
+  .inflight-eta {
+    background: var(--surface-page); padding: 10px 14px;
+    border-radius: 8px; font-size: 12px; color: var(--text-secondary);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ============ RECIPIENTS GRID ============ */
+  .rec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 0 20px 20px; }
+  .rec-cell {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px; border-radius: 8px;
+    transition: background var(--dur-fast) var(--ease-std);
+    cursor: pointer; min-width: 0;
+  }
+  .rec-cell:hover { background: var(--surface-page); }
+  .rec-av { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    color: #fff; font-weight: 700; font-size: 12px;
+    display: flex; align-items: center; justify-content: center; position: relative; }
+  .rec-flag {
+    position: absolute; bottom: -2px; right: -2px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; color: var(--text-primary);
+    font-size: 7px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff;
+  }
+  .rec-info { min-width: 0; flex: 1; }
+  .rec-name { font-size: 13px; font-weight: 600; line-height: 1.2;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rec-last { font-size: 11px; color: var(--text-secondary); }
+
+  /* ============ RESPONSIVE ============ */
+  .hamburger {
+    display: none;
+    width: 40px; height: 40px; border-radius: 8px;
+    background: transparent; border: none; cursor: pointer;
+    align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    transition: background var(--dur-fast) var(--ease-std), color var(--dur-fast) var(--ease-std);
+  }
+  .hamburger:hover { background: var(--surface-page); color: var(--text-primary); }
+  .sidebar-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(10,37,64,0.45);
+    z-index: 40; opacity: 0; pointer-events: none;
+    transition: opacity 200ms var(--ease-std);
+  }
+  body.sidebar-open .sidebar-backdrop { opacity: 1; pointer-events: auto; }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar {
+      position: fixed; top: 0; left: 0;
+      height: 100vh; width: 280px;
+      z-index: 50;
+      transform: translateX(-100%);
+      transition: transform 280ms var(--ease-std);
+      box-shadow: 4px 0 24px rgba(10,37,64,0.18);
+    }
+    body.sidebar-open .sidebar { transform: translateX(0); }
+    .hamburger { display: inline-flex; }
+    .topbar { padding: 0 16px; gap: 8px; }
+    .content { padding: 24px 16px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .grid { grid-template-columns: 1fr; }
+    .topbar-actions { gap: 4px; }
+    .user-info { display: none; }
+    .user-menu { padding: 6px; }
+    .ico-btn { width: 38px; height: 38px; }
+    .lang-btn { padding: 8px 10px; }
+    .lang-btn svg:first-child { display: none; }
+  }
+
+  @media (max-width: 640px) {
+    .kpi-grid { grid-template-columns: 1fr; }
+    .page-head { gap: 16px; }
+    .page-title { font-size: 22px; }
+    .page-actions { width: 100%; flex-wrap: wrap; }
+    .page-actions .btn { flex: 1 1 140px; justify-content: center; }
+    .content { padding: 20px 14px; }
+    .topbar { padding: 0 14px; }
+    .card-head { padding: 16px 16px 0; gap: 12px; flex-wrap: wrap; }
+    .card-body, .chart-wrap, .fx-list, .rec-grid { padding-left: 16px; padding-right: 16px; }
+    thead th, tbody td { padding-left: 12px; padding-right: 12px; }
+    thead th { font-size: 10px; }
+    tbody td { font-size: 12px; padding-top: 12px; padding-bottom: 12px; }
+    .recipient-cell { gap: 8px; }
+    .row-av-sm { width: 28px; height: 28px; font-size: 11px; }
+    .quick-send { padding: 20px; }
+    .qs-amount { font-size: 22px; }
+    .rec-grid { grid-template-columns: 1fr; }
+    .tabs .tab-btn { padding: 5px 10px; font-size: 11px; }
+    .lang-menu { right: -40px; }
+  }
+
+  @media (max-width: 420px) {
+    .topbar-actions .ico-btn { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <a class="logo" href="dashboard-web.html" aria-label="RemitPay — Dashboard">
+      <div class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><ellipse cx="12" cy="12" rx="4" ry="9"/></svg></div>
+      <div class="logo-text">Remit<span>Pay</span></div>
+    </a>
+    <div class="nav-section">
+      <a class="nav-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        <span data-i18n="nav.dashboard">Dashboard</span>
+      </a>
+      <a class="nav-item" href="send-money-web.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span data-i18n="nav.sendMoney">Send Money</span>
+      </a>
+      <a class="nav-item" href="add-money-web.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span data-i18n="nav.addMoney">Add Money</span>
+      </a>
+      <a class="nav-item" href="recipients-web.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span data-i18n="nav.recipients">Recipients</span>
+      </a>
+      <a class="nav-item" href="transaction-history.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span data-i18n="nav.transactionHistory">Transaction history</span>
+      </a>
+      <a class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span data-i18n="nav.exchangeRates">Exchange Rates</span>
+      </a>
+      <a class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span data-i18n="nav.cards">Cards</span>
+      </a>
+      <a class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span data-i18n="nav.settings">Settings</span>
+      </a>
+      <a class="nav-item" href="help.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span data-i18n="nav.helpSupport">Help & Support</span>
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <!-- <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="Search recipients, transfers, currencies…">
+        <kbd>⌘K</kbd>
+      </div> -->
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <div class="lang-switcher" id="langSwitcher">
+          <button class="lang-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Change language">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span data-lang-current>EN</span>
+            <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language">
+            <li role="option" data-lang="en" tabindex="0">
+              <span class="lang-code">EN</span>
+              <span data-i18n="lang.en">English</span>
+              <svg class="check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </li>
+            <li role="option" data-lang="bn" tabindex="0">
+              <span class="lang-code">BN</span>
+              <span data-i18n="lang.bn">বাংলা</span>
+              <svg class="check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </li>
+          </ul>
+        </div>
+        <!-- <button class="ico-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button> -->
+        <!-- <button class="ico-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="dot"></span>
+        </button> -->
+        <button class="user-menu">
+          <div class="user-av">CR</div>
+          <div class="user-info">
+            <div class="user-name">Carlos R.</div>
+            <div class="user-role" data-i18n="user.role">Personal</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-secondary)"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Page header -->
+      <div class="page-head">
+        <div>
+          <h3 class="page-title" data-i18n="page.welcome">Welcome back, Carlos</h3>
+          <p class="page-sub" data-i18n="page.subtitle">Here's how your transfers are performing this month.</p>
+        </div>
+        <div class="page-actions">
+          <!-- <button class="btn btn-secondary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </button> -->
+          <button class="btn btn-secondary" onclick="window.location.href='add-money-web.html'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span data-i18n="action.addMoney">Add Money</span>
+          </button>
+          <button class="btn btn-primary" onclick="window.location.href='send-money-web.html'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span data-i18n="action.sendMoney">Send Money</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Total balance (USD equivalent) -->
+      <div class="balance-summary">
+        <div class="balance-main">
+          <div class="balance-label" data-i18n="balance.total">Total balance · USD equivalent</div>
+          <div class="balance-amount-row">
+            <span class="balance-amount">$5,076.10</span>
+            <span class="balance-amount-curr">USD</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Row -->
+      <div class="kpi-grid">
+        <div class="kpi kpi-wallet">
+          <div class="kpi-flag" role="img" aria-label="United States flag">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <rect width="60" height="60" fill="#FFFFFF"/>
+              <g fill="#B22234">
+                <rect y="0"    width="60" height="4.6"/>
+                <rect y="9.2"  width="60" height="4.6"/>
+                <rect y="18.4" width="60" height="4.6"/>
+                <rect y="27.6" width="60" height="4.6"/>
+                <rect y="36.8" width="60" height="4.6"/>
+                <rect y="46.0" width="60" height="4.6"/>
+                <rect y="55.2" width="60" height="4.8"/>
+              </g>
+              <rect width="24" height="32.2" fill="#3C3B6E"/>
+              <g fill="#FFFFFF">
+                <circle cx="3.5"  cy="4"  r="1"/><circle cx="8.5"  cy="4"  r="1"/><circle cx="13.5" cy="4"  r="1"/><circle cx="18.5" cy="4"  r="1"/>
+                <circle cx="6"    cy="9"  r="1"/><circle cx="11"   cy="9"  r="1"/><circle cx="16"   cy="9"  r="1"/>
+                <circle cx="3.5"  cy="14" r="1"/><circle cx="8.5"  cy="14" r="1"/><circle cx="13.5" cy="14" r="1"/><circle cx="18.5" cy="14" r="1"/>
+                <circle cx="6"    cy="19" r="1"/><circle cx="11"   cy="19" r="1"/><circle cx="16"   cy="19" r="1"/>
+                <circle cx="3.5"  cy="24" r="1"/><circle cx="8.5"  cy="24" r="1"/><circle cx="13.5" cy="24" r="1"/><circle cx="18.5" cy="24" r="1"/>
+                <circle cx="6"    cy="29" r="1"/><circle cx="11"   cy="29" r="1"/><circle cx="16"   cy="29" r="1"/>
+              </g>
+            </svg>
+          </div>
+          <div class="kpi-value">$2,415.00</div>
+          <span class="kpi-delta delta-flat" data-i18n="kpi.balanceSub">USD wallet</span>
+        </div>
+        <div class="kpi kpi-wallet">
+          <div class="kpi-flag" role="img" aria-label="Canada flag">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <rect width="60" height="60" fill="#FFFFFF"/>
+              <rect width="15" height="60" fill="#D52B1E"/>
+              <rect x="45" width="15" height="60" fill="#D52B1E"/>
+              <path d="M30 13 L31.6 22 L36 21 L33.5 27 L40 30 L33.5 31 L34.5 36 L30 33 L25.5 36 L26.5 31 L20 30 L26.5 27 L24 21 L28.4 22 Z" fill="#D52B1E"/>
+            </svg>
+          </div>
+          <div class="kpi-value">C$1,250.00</div>
+          <span class="kpi-delta delta-flat" data-i18n="kpi.walletCAD">CAD wallet</span>
+        </div>
+        <div class="kpi kpi-wallet">
+          <div class="kpi-flag" role="img" aria-label="European Union flag">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <rect width="60" height="60" fill="#003399"/>
+              <g fill="#FFCC00">
+                <circle cx="30"   cy="12"   r="1.8"/>
+                <circle cx="39"   cy="14.4" r="1.8"/>
+                <circle cx="45.6" cy="21"   r="1.8"/>
+                <circle cx="48"   cy="30"   r="1.8"/>
+                <circle cx="45.6" cy="39"   r="1.8"/>
+                <circle cx="39"   cy="45.6" r="1.8"/>
+                <circle cx="30"   cy="48"   r="1.8"/>
+                <circle cx="21"   cy="45.6" r="1.8"/>
+                <circle cx="14.4" cy="39"   r="1.8"/>
+                <circle cx="12"   cy="30"   r="1.8"/>
+                <circle cx="14.4" cy="21"   r="1.8"/>
+                <circle cx="21"   cy="14.4" r="1.8"/>
+              </g>
+            </svg>
+          </div>
+          <div class="kpi-value">€890.00</div>
+          <span class="kpi-delta delta-flat" data-i18n="kpi.walletEUR">EUR wallet</span>
+        </div>
+        <div class="kpi kpi-wallet">
+          <div class="kpi-flag" role="img" aria-label="United Kingdom flag">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <rect width="60" height="60" fill="#012169"/>
+              <line x1="0"  y1="0"  x2="60" y2="60" stroke="#FFFFFF" stroke-width="10"/>
+              <line x1="60" y1="0"  x2="0"  y2="60" stroke="#FFFFFF" stroke-width="10"/>
+              <line x1="0"  y1="0"  x2="60" y2="60" stroke="#C8102E" stroke-width="3.5"/>
+              <line x1="60" y1="0"  x2="0"  y2="60" stroke="#C8102E" stroke-width="3.5"/>
+              <rect x="24" y="0"  width="12" height="60" fill="#FFFFFF"/>
+              <rect x="0"  y="24" width="60" height="12" fill="#FFFFFF"/>
+              <rect x="27" y="0"  width="6"  height="60" fill="#C8102E"/>
+              <rect x="0"  y="27" width="60" height="6"  fill="#C8102E"/>
+            </svg>
+          </div>
+          <div class="kpi-value">£620.00</div>
+          <span class="kpi-delta delta-flat" data-i18n="kpi.walletGBP">GBP wallet</span>
+        </div>
+      </div>
+
+      <!-- Two-col grid -->
+      <div class="grid">
+
+        <!-- LEFT COLUMN -->
+        <div class="col">
+
+          <!-- Chart -->
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title" data-i18n="chart.title">Remittance trend</div>
+                <div style="font-size:12px;color:var(--text-secondary);margin-top:4px" data-i18n="chart.subtitle">Volume sent over time</div>
+              </div>
+              <div class="tabs" id="chartTabs">
+                <button class="tab-btn" data-range="7d" data-i18n="chart.range.7d">7d</button>
+                <button class="tab-btn" data-range="30d" data-i18n="chart.range.30d">30d</button>
+                <button class="tab-btn" data-range="3m" data-i18n="chart.range.3m">3m</button>
+                <button class="tab-btn active" data-range="1y" data-i18n="chart.range.1y">1y</button>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <div class="chart-meta">
+                <div class="chart-legend"><span class="legend-dot" style="background:var(--brand-primary)"></span> <span data-i18n="chart.legendSent">Sent</span></div>
+                <div class="chart-legend"><span class="legend-dot" style="background:var(--brand-accent)"></span> <span data-i18n="chart.legendReceived">Received</span></div>
+              </div>
+              <div class="chart">
+                <svg viewBox="0 0 700 240" preserveAspectRatio="none">
+                  <!-- Gridlines -->
+                  <g stroke="#E5EDF5" stroke-width="1">
+                    <line x1="0" y1="60" x2="700" y2="60"/>
+                    <line x1="0" y1="120" x2="700" y2="120"/>
+                    <line x1="0" y1="180" x2="700" y2="180"/>
+                  </g>
+                  <!-- Y labels (populated by JS) -->
+                  <g class="chart-y-labels" fill="#9AAEC1" font-size="10" font-family="DM Sans">
+                    <text class="y-label-top" x="4" y="56">$2k</text>
+                    <text class="y-label-mid" x="4" y="116">$1.5k</text>
+                    <text class="y-label-bot" x="4" y="176">$1k</text>
+                  </g>
+                  <!-- X labels (populated by JS) -->
+                  <g class="chart-x-labels" fill="#9AAEC1" font-size="11" font-family="DM Sans" text-anchor="middle"></g>
+                  <!-- Area fill -->
+                  <defs>
+                    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#00A86B" stop-opacity="0.25"/>
+                      <stop offset="100%" stop-color="#00A86B" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path class="chart-area" d="" fill="url(#areaGrad)"/>
+                  <!-- Sent line -->
+                  <path class="chart-sent-line" d=""
+                        stroke="#00A86B" stroke-width="2.5" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                  <!-- Received line -->
+                  <path class="chart-recv-line" d=""
+                        stroke="#00C474" stroke-width="2" fill="none" stroke-dasharray="4 4"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                  <!-- Hover overlay (animated) -->
+                  <g class="chart-hover" id="chartHover">
+                    <line class="chart-guide" x1="650" y1="0" x2="650" y2="210" stroke="#00A86B" stroke-width="1" stroke-dasharray="3 3" opacity="0.45"/>
+                    <circle class="hover-dot-recv" cx="650" cy="65" r="4" fill="#fff" stroke="#00C474" stroke-width="2"/>
+                    <circle class="hover-dot-sent" cx="650" cy="50" r="5.5" fill="#fff" stroke="#00A86B" stroke-width="2.5"/>
+                    <g class="hover-tooltip" transform="translate(545,4)">
+                      <rect width="140" height="58" rx="8" fill="#0A2540"/>
+                      <text class="tt-month" x="12" y="18" fill="#9AAEC1" font-size="10" font-family="DM Sans" font-weight="600">SEPTEMBER</text>
+                      <text class="tt-sent" x="12" y="35" fill="#fff" font-size="13" font-family="DM Sans" font-weight="700">$1,920 sent</text>
+                      <text class="tt-recv" x="12" y="50" fill="#00C474" font-size="11" font-family="DM Sans" font-weight="500">$1,830 received</text>
+                    </g>
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity table -->
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title" data-i18n="activity.title">Recent activity</div>
+              <a class="card-link" href="transaction-history.html" data-i18n="activity.viewAll">View all transfers →</a>
+            </div>
+            <div style="overflow-x:auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="activity.th.recipient">Recipient</th>
+                    <th data-i18n="activity.th.sent">Sent</th>
+                    <th data-i18n="activity.th.received">Received</th>
+                    <th data-i18n="activity.th.fee">Fee</th>
+                    <th data-i18n="activity.th.status">Status</th>
+                    <th data-i18n="activity.th.date">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="recipient-cell">
+                        <div class="row-av-sm av-3">AN</div>
+                        <div>
+                          <div class="recipient-name">Ana Krishnan</div>
+                          <div class="recipient-meta"><span data-i18n="activity.method.bank">Bank</span> · <span data-i18n="country.india">India</span></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="amt">$180.00</div><div class="amt-sub">USD</div></td>
+                    <td><div class="amt">₹15,000</div><div class="amt-sub">INR</div></td>
+                    <td><div class="amt">$1.99</div></td>
+                    <td><span class="status-tag status-success" data-i18n="status.arrived">Arrived</span></td>
+                    <td><div class="amt-sub">Apr 24, 2026</div></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="recipient-cell">
+                        <div class="row-av-sm av-1">M</div>
+                        <div>
+                          <div class="recipient-name">Mom (Lourdes)</div>
+                          <div class="recipient-meta">GCash · <span data-i18n="country.philippines">Philippines</span></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="amt">$250.00</div><div class="amt-sub">USD</div></td>
+                    <td><div class="amt">₱14,200</div><div class="amt-sub">PHP</div></td>
+                    <td><div class="amt">$0.99</div></td>
+                    <td><span class="status-tag status-pending">
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      <span data-i18n="status.onTheWay">On the way</span></span></td>
+                    <td><div class="amt-sub" data-i18n="activity.time.justNow">Just now</div></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="recipient-cell">
+                        <div class="row-av-sm av-2">JR</div>
+                        <div>
+                          <div class="recipient-name">Jose Ramirez</div>
+                          <div class="recipient-meta"><span data-i18n="activity.method.bank">Bank</span> · <span data-i18n="country.mexico">Mexico</span></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="amt">$240.00</div><div class="amt-sub">USD</div></td>
+                    <td><div class="amt">$4,128</div><div class="amt-sub">MXN</div></td>
+                    <td><div class="amt">$2.49</div></td>
+                    <td><span class="status-tag status-success" data-i18n="status.arrived">Arrived</span></td>
+                    <td><div class="amt-sub">Apr 21, 2026</div></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="recipient-cell">
+                        <div class="row-av-sm av-4">EL</div>
+                        <div>
+                          <div class="recipient-name">Elena Okafor</div>
+                          <div class="recipient-meta"><span data-i18n="activity.method.cashPickup">Cash pickup</span> · <span data-i18n="country.nigeria">Nigeria</span></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="amt">$120.00</div><div class="amt-sub">USD</div></td>
+                    <td><div class="amt">₦82,500</div><div class="amt-sub">NGN</div></td>
+                    <td><div class="amt">$3.99</div></td>
+                    <td><span class="status-tag status-warn">
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      <span data-i18n="status.actionNeeded">Action needed</span></span></td>
+                    <td><div class="amt-sub">Apr 19, 2026</div></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="recipient-cell">
+                        <div class="row-av-sm av-5">SK</div>
+                        <div>
+                          <div class="recipient-name">Sami Khan</div>
+                          <div class="recipient-meta"><span data-i18n="activity.method.bank">Bank</span> · <span data-i18n="country.bangladesh">Bangladesh</span></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="amt">$95.00</div><div class="amt-sub">USD</div></td>
+                    <td><div class="amt">৳10,400</div><div class="amt-sub">BDT</div></td>
+                    <td><div class="amt">$1.49</div></td>
+                    <td><span class="status-tag status-success" data-i18n="status.arrived">Arrived</span></td>
+                    <td><div class="amt-sub">Apr 17, 2026</div></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="recipient-cell">
+                        <div class="row-av-sm av-6">DR</div>
+                        <div>
+                          <div class="recipient-name">Diana Reyes</div>
+                          <div class="recipient-meta"><span data-i18n="activity.method.bank">Bank</span> · <span data-i18n="country.colombia">Colombia</span></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="amt">$310.00</div><div class="amt-sub">USD</div></td>
+                    <td><div class="amt">$1,275,000</div><div class="amt-sub">COP</div></td>
+                    <td><div class="amt">$2.99</div></td>
+                    <td><span class="status-tag status-success" data-i18n="status.arrived">Arrived</span></td>
+                    <td><div class="amt-sub">Apr 14, 2026</div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="col">
+
+          <!-- Check exchange rate (amount form) -->
+          <div class="quick-send">
+            <div class="qs-label" data-i18n="checkExchangeRate.title">Check exchange rate</div>
+            <div class="qs-input">
+              <input class="qs-amount" id="qsSendAmt" type="text" inputmode="decimal" value="0.00" placeholder="0.00">
+              <span class="qs-curr">USD</span>
+            </div>
+            <div class="qs-arrow">↓</div>
+            <div class="qs-input">
+              <input class="qs-amount" id="qsRecvAmt" type="text" readonly value="0.00" placeholder="0.00" aria-label="Receive amount">
+              <select class="qs-curr-select" id="qsRecvCurr" aria-label="Receive currency">
+                <option value="BDT" selected>BDT</option>
+                <option value="INR">INR</option>
+                <option value="PHP">PHP</option>
+                <option value="MXN">MXN</option>
+                <option value="NGN">NGN</option>
+                <option value="COP">COP</option>
+              </select>
+            </div>
+            <div class="qs-rate-line">
+              <span id="qsRateLine">1 USD = — —</span>
+              <span><span data-i18n="quickSend.feeLabel">Fee</span> <span id="qsFee">—</span></span>
+            </div>
+            <button class="qs-cta" id="qsCta" type="button" data-i18n="quickSend.cta">Continue →</button>
+          </div>
+
+          <!-- Quick send (recipient grid) -->
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title" data-i18n="quickSend.title">Quick send</div>
+              <a class="card-link" href="recipients-web.html" data-i18n="recipients.manage">Manage →</a>
+            </div>
+            <div class="rec-grid">
+              <div class="rec-cell">
+                <div class="rec-av av-1">M<span class="rec-flag">PH</span></div>
+                <div class="rec-info">
+                  <div class="rec-name">Mom</div>
+                  <div class="rec-last"><span data-i18n="recipients.sentLabel">Sent</span> ₱14k</div>
+                </div>
+              </div>
+              <div class="rec-cell">
+                <div class="rec-av av-2">JR<span class="rec-flag">MX</span></div>
+                <div class="rec-info">
+                  <div class="rec-name">Jose R.</div>
+                  <div class="rec-last"><span data-i18n="recipients.sentLabel">Sent</span> $4.1k</div>
+                </div>
+              </div>
+              <div class="rec-cell">
+                <div class="rec-av av-3">AN<span class="rec-flag">IN</span></div>
+                <div class="rec-info">
+                  <div class="rec-name">Ana K.</div>
+                  <div class="rec-last"><span data-i18n="recipients.sentLabel">Sent</span> ₹15k</div>
+                </div>
+              </div>
+              <div class="rec-cell">
+                <div class="rec-av av-4">EL<span class="rec-flag">NG</span></div>
+                <div class="rec-info">
+                  <div class="rec-name">Elena O.</div>
+                  <div class="rec-last"><span data-i18n="recipients.sentLabel">Sent</span> ₦82k</div>
+                </div>
+              </div>
+              <div class="rec-cell">
+                <div class="rec-av av-5">SK<span class="rec-flag">BD</span></div>
+                <div class="rec-info">
+                  <div class="rec-name">Sami K.</div>
+                  <div class="rec-last"><span data-i18n="recipients.sentLabel">Sent</span> ৳10k</div>
+                </div>
+              </div>
+              <div class="rec-cell">
+                <div class="rec-av av-6">DR<span class="rec-flag">CO</span></div>
+                <div class="rec-info">
+                  <div class="rec-name">Diana R.</div>
+                  <div class="rec-last"><span data-i18n="recipients.sentLabel">Sent</span> $1.2M</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="locales/i18n.js"></script>
+<script src="auth.js"></script>
+<script src="recipients-store.js"></script>
+<script src="mobile-nav.js"></script>
+<script>
+  // ============ Remittance trend chart — range-switchable ============
+  (function () {
+    const VB_W = 700, X_LEFT = 50, X_RIGHT = 650, Y_TOP = 50, Y_BOT = 180, BASE_Y = 210;
+    const TT_W = 140, TT_H = 58;
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+
+    // Datasets per range. `kind` controls which i18n namespace to look up
+    // for the short X-label and the long tooltip label.
+    const DATASETS = {
+      '7d': {
+        kind: 'days',
+        keys: ['mon','tue','wed','thu','fri','sat','sun'],
+        sent:     [240, 280, 200, 320, 270, 410, 380],
+        received: [220, 260, 190, 300, 250, 390, 360]
+      },
+      '30d': {
+        kind: 'weeks',
+        keys: ['w1','w2','w3','w4'],
+        sent:     [1450, 1620, 1380, 1810],
+        received: [1320, 1480, 1290, 1700]
+      },
+      '3m': {
+        kind: 'months',
+        keys: ['oct','nov','dec'],
+        sent:     [1820, 1700, 2050],
+        received: [1730, 1620, 1950]
+      },
+      '1y': {
+        kind: 'months',
+        keys: ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'],
+        sent:     [1170, 1330, 1250, 1580, 1420, 1750, 1670, 1880, 1920, 1820, 1700, 2050],
+        received: [1080, 1240, 1160, 1490, 1330, 1660, 1580, 1790, 1830, 1730, 1620, 1950]
+      }
+    };
+    const KIND_TO_LONG = { days: 'daysLong', weeks: 'weeksLong', months: 'monthsLong' };
+    const KIND_TO_SHORT = { days: 'chart.days', weeks: 'chart.weeks', months: 'months' };
+
+    const svg = document.querySelector('.chart svg');
+    if (!svg) return;
+    const tabs = document.querySelectorAll('#chartTabs .tab-btn');
+    const xLabelsG = svg.querySelector('.chart-x-labels');
+    const yTopEl = svg.querySelector('.y-label-top');
+    const yMidEl = svg.querySelector('.y-label-mid');
+    const yBotEl = svg.querySelector('.y-label-bot');
+    const areaPath = svg.querySelector('.chart-area');
+    const sentPath = svg.querySelector('.chart-sent-line');
+    const recvPath = svg.querySelector('.chart-recv-line');
+    const hover = svg.querySelector('#chartHover');
+    const guide = svg.querySelector('.chart-guide');
+    const dotSent = svg.querySelector('.hover-dot-sent');
+    const dotRecv = svg.querySelector('.hover-dot-recv');
+    const tooltip = svg.querySelector('.hover-tooltip');
+    const ttMonth = svg.querySelector('.tt-month');
+    const ttSent  = svg.querySelector('.tt-sent');
+    const ttRecv  = svg.querySelector('.tt-recv');
+
+    const t = (k) => (window.i18n ? window.i18n.t(k) : k);
+
+    // Mutable state for the active range.
+    let currentRange = '1y';
+    let points = [];   // [{ key, x, sentY, recvY, sent, received }, ...]
+    let xLabelEls = []; // <text> nodes for the active range's X axis
+    let lastIdx = -1;
+
+    function fmtMoney(v) {
+      if (v >= 1000) {
+        const k = v / 1000;
+        return '$' + (k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)) + 'k';
+      }
+      return '$' + Math.round(v);
+    }
+
+    function pathD(xs, ys) {
+      let d = '';
+      for (let i = 0; i < xs.length; i++) {
+        d += (i === 0 ? 'M' : ' L') + xs[i] + ' ' + ys[i];
+      }
+      return d;
+    }
+    function areaD(xs, sentY) {
+      const last = xs[xs.length - 1], first = xs[0];
+      return pathD(xs, sentY) + ` L${last} ${BASE_Y} L${first} ${BASE_Y} Z`;
+    }
+
+    function buildXLabels() {
+      xLabelsG.replaceChildren();
+      xLabelEls = points.map((p) => {
+        const el = document.createElementNS(SVG_NS, 'text');
+        el.setAttribute('class', 'chart-month-label');
+        el.setAttribute('x', p.x);
+        el.setAttribute('y', 232);
+        el.textContent = p.shortLabel;
+        xLabelsG.appendChild(el);
+        return el;
+      });
+    }
+
+    function buildPoints(range) {
+      const ds = DATASETS[range];
+      const N = ds.sent.length;
+      const xs = N === 1
+        ? [(X_LEFT + X_RIGHT) / 2]
+        : Array.from({ length: N }, (_, i) => X_LEFT + i * (X_RIGHT - X_LEFT) / (N - 1));
+      const all = ds.sent.concat(ds.received);
+      const min = Math.min(...all), max = Math.max(...all);
+      const range01 = (max - min) || 1;
+      const yScale = (v) => Y_TOP + (Y_BOT - Y_TOP) * (1 - (v - min) / range01);
+
+      const shortNs = KIND_TO_SHORT[ds.kind];
+      const longNs  = `chart.${KIND_TO_LONG[ds.kind]}`;
+
+      return ds.keys.map((key, i) => ({
+        key,
+        x: xs[i],
+        sentY: yScale(ds.sent[i]),
+        recvY: yScale(ds.received[i]),
+        sent: ds.sent[i],
+        received: ds.received[i],
+        shortLabel: t(`${shortNs}.${key}`),
+        longLabel:  t(`${longNs}.${key}`),
+        min, max
+      }));
+    }
+
+    function renderRange(range) {
+      currentRange = range;
+      points = buildPoints(range);
+      const xs = points.map(p => p.x);
+      const sentYs = points.map(p => p.sentY);
+      const recvYs = points.map(p => p.recvY);
+
+      areaPath.setAttribute('d', areaD(xs, sentYs));
+      sentPath.setAttribute('d', pathD(xs, sentYs));
+      recvPath.setAttribute('d', pathD(xs, recvYs));
+
+      // Auto-scale Y axis labels to dataset min..max.
+      const min = points[0].min, max = points[0].max;
+      yTopEl.textContent = fmtMoney(max);
+      yMidEl.textContent = fmtMoney((min + max) / 2);
+      yBotEl.textContent = fmtMoney(min);
+
+      buildXLabels();
+      hideHover();
+    }
+
+    function showPoint(idx) {
+      const p = points[idx];
+      if (!p) return;
+      guide.setAttribute('x1', p.x);
+      guide.setAttribute('x2', p.x);
+      dotSent.setAttribute('cx', p.x);
+      dotSent.setAttribute('cy', p.sentY);
+      dotRecv.setAttribute('cx', p.x);
+      dotRecv.setAttribute('cy', p.recvY);
+
+      ttMonth.textContent = p.longLabel;
+      ttSent.textContent = `$${p.sent.toLocaleString()} ${t('chart.sentSuffix')}`;
+      ttRecv.textContent = `$${p.received.toLocaleString()} ${t('chart.receivedSuffix')}`;
+
+      const ttX = (p.x + 18 + TT_W > VB_W) ? Math.max(0, p.x - 18 - TT_W) : p.x + 18;
+      const ttY = Math.max(4, Math.min(p.sentY - TT_H / 2, BASE_Y - TT_H));
+      tooltip.setAttribute('transform', `translate(${ttX} ${ttY})`);
+
+      xLabelEls.forEach((el, i) => el.classList.toggle('active', i === idx));
+      lastIdx = idx;
+    }
+    function hideHover() {
+      hover.classList.remove('show');
+      xLabelEls.forEach((el) => el.classList.remove('active'));
+      lastIdx = -1;
+    }
+
+    function nearestIdx(clientX) {
+      const rect = svg.getBoundingClientRect();
+      const vbX = (clientX - rect.left) / rect.width * VB_W;
+      let best = 0, bestDist = Infinity;
+      for (let i = 0; i < points.length; i++) {
+        const dist = Math.abs(points[i].x - vbX);
+        if (dist < bestDist) { bestDist = dist; best = i; }
+      }
+      return best;
+    }
+
+    function onMove(e) {
+      const idx = nearestIdx(e.clientX);
+      hover.classList.add('show');
+      if (idx !== lastIdx) showPoint(idx);
+    }
+
+    svg.addEventListener('mousemove', onMove);
+    svg.addEventListener('mouseleave', hideHover);
+    svg.addEventListener('touchstart', (e) => { if (e.touches[0]) onMove(e.touches[0]); }, { passive: true });
+    svg.addEventListener('touchmove',  (e) => { if (e.touches[0]) onMove(e.touches[0]); }, { passive: true });
+    svg.addEventListener('touchend', hideHover);
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const range = tab.dataset.range;
+        if (!DATASETS[range] || range === currentRange) return;
+        tabs.forEach(b => b.classList.toggle('active', b === tab));
+        renderRange(range);
+      });
+    });
+
+    document.addEventListener('languagechange', () => {
+      // Re-render so the X labels and tooltip use the new locale.
+      renderRange(currentRange);
+    });
+
+    renderRange(currentRange);
+  })();
+</script>
+<script>
+  // ============ Quick send — live conversion ============
+  (function () {
+    const sendEl  = document.getElementById('qsSendAmt');
+    const recvEl  = document.getElementById('qsRecvAmt');
+    const currEl  = document.getElementById('qsRecvCurr');
+    const rateEl  = document.getElementById('qsRateLine');
+    const feeEl   = document.getElementById('qsFee');
+    const ctaEl   = document.getElementById('qsCta');
+    if (!sendEl || !recvEl || !currEl) return;
+
+    // Source of truth for rates (matches recipients-store COUNTRY_META).
+    const META = (window.recipientsStore && window.recipientsStore.COUNTRY_META) || {};
+    const RATES = {
+      INR: META.india?.rate       ?? 83.42,
+      PHP: META.philippines?.rate ?? 56.84,
+      MXN: META.mexico?.rate      ?? 17.20,
+      NGN: META.nigeria?.rate     ?? 687.50,
+      BDT: META.bangladesh?.rate  ?? 109.45,
+      COP: META.colombia?.rate    ?? 4112.30,
+    };
+
+    // Map a currency back to a recipient (for the CTA's deeplink to send-money).
+    function pickRecipientForCurrency(curr) {
+      if (!window.recipientsStore) return null;
+      return window.recipientsStore.list().find(r => r.curr === curr) || null;
+    }
+
+    function calcFee(amount) {
+      if (!(amount > 0)) return 0;
+      // Mirrors send-money: $0.99 base + 0.5% of amount, capped at $4.99.
+      return Math.min(0.99 + amount * 0.005, 4.99);
+    }
+
+    function recompute() {
+      const send = parseFloat(String(sendEl.value).replace(/,/g, '')) || 0;
+      const curr = currEl.value;
+      const rate = RATES[curr] || 0;
+      const recv = send * rate;
+
+      recvEl.value = recv > 0
+        ? recv.toLocaleString('en-US', { maximumFractionDigits: 0 })
+        : '0.00';
+
+      rateEl.textContent = `1 USD = ${rate.toFixed(2)} ${curr}`;
+
+      const fee = calcFee(send);
+      feeEl.textContent = fee > 0 ? '$' + fee.toFixed(2) : '—';
+
+      // Build the CTA URL: include amount and (if found) a recipient pre-selected
+      // by currency, so the user lands directly on the review step.
+      const params = new URLSearchParams();
+      const recipient = pickRecipientForCurrency(curr);
+      if (recipient) params.set('recipient', recipient.id);
+      if (send > 0)  params.set('amount', String(send));
+      if (recipient && send > 0) params.set('step', '3');
+      else if (send > 0)         params.set('step', '2');
+      ctaEl.dataset.target = 'send-money-web.html' + (params.toString() ? '?' + params : '');
+      ctaEl.disabled = send <= 0;
+      ctaEl.style.opacity = send > 0 ? '' : '0.7';
+    }
+
+    // Restrict typing to digits + a single decimal point.
+    sendEl.addEventListener('input', (e) => {
+      let v = e.target.value.replace(/[^\d.]/g, '');
+      const firstDot = v.indexOf('.');
+      if (firstDot !== -1) {
+        v = v.slice(0, firstDot + 1) + v.slice(firstDot + 1).replace(/\./g, '');
+      }
+      e.target.value = v;
+      recompute();
+    });
+    currEl.addEventListener('change', recompute);
+    ctaEl.addEventListener('click', () => {
+      const url = ctaEl.dataset.target;
+      if (url) window.location.href = url;
+    });
+
+    // If recipients change (e.g. user adds/removes one in another tab), re-pick.
+    if (window.recipientsStore) window.recipientsStore.onChange(recompute);
+
+    recompute();
+  })();
+</script>
+
+</body>
+</html>

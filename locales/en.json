@@ -1,0 +1,592 @@
+{
+  "lang": {
+    "en": "English",
+    "bn": "বাংলা"
+  },
+  "auth": {
+    "logout": "Log out",
+    "login": {
+      "title": "Welcome back",
+      "sub": "Sign in to continue to your wallet.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "remember": "Remember me",
+      "forgot": "Forgot password?",
+      "submit": "Sign in",
+      "signingIn": "Signing in…",
+      "errorRequired": "Please enter both email and password.",
+      "errorEmail": "Please enter a valid email address.",
+      "errorPassword": "Password must be at least 6 characters.",
+      "demoTitle": "Demo mode:",
+      "demoText": "use any email and a password of 6+ characters to sign in.",
+      "secure": "Encrypted connection · Your data is protected"
+    },
+    "forgot": {
+      "title": "Forgot password?",
+      "sub": "Enter your email and we'll send you a reset link.",
+      "submit": "Send reset link",
+      "close": "Close",
+      "success": "If an account with that email exists, we've sent reset instructions."
+    }
+  },
+  "common": {
+    "edit": "Edit",
+    "fee": "Fee",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "reference": "Reference",
+    "method": "Method",
+    "free": "Free",
+    "quickAmounts": "Quick amounts",
+    "close": "Close",
+    "search": "Search",
+    "from": "From",
+    "to": "To",
+    "reset": "Reset",
+    "all": "All",
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "topbar": {
+    "securePayment": "Secure payment",
+    "secureTransfer": "Secure transfer"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "sendMoney": "Send Money",
+    "addMoney": "Add Money",
+    "recipients": "Recipients",
+    "activity": "Activity",
+    "transactionHistory": "Transaction history",
+    "exchangeRates": "Exchange Rates",
+    "cards": "Cards",
+    "settings": "Settings",
+    "helpSupport": "Help & Support"
+  },
+  "help": {
+    "title": "Help Center",
+    "sub": "We're here to help. Reach us through any channel below.",
+    "contactInfo": "Contact information",
+    "contactSub": "Tap any card to reach our team directly.",
+    "enquirySub": "Describe your issue and our team will reply within 24 hours.",
+    "phone": "Phone",
+    "email": "Email",
+    "hours": "Support hours",
+    "hoursValue": "24/7 — every day",
+    "address": "Office",
+    "addressValue": "Dhaka, Bangladesh",
+    "enquiry": "Submit an enquiry",
+    "categoryLabel": "Category",
+    "categoryPlaceholder": "Choose a category",
+    "catTransaction": "Transaction issue",
+    "catAccount": "Account issue",
+    "catPayment": "Payment issue",
+    "catCard": "Card issue",
+    "catOther": "Other",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "Brief topic",
+    "messageLabel": "Describe your issue",
+    "messagePlaceholder": "Tell us what's going on…",
+    "attachLabel": "Attachments",
+    "attachZone": "Click to attach files (screenshots, PDFs, etc.)",
+    "attachHint": "Up to 5 files, 10 MB each",
+    "attachRemove": "Remove attachment",
+    "attachOne": "attachment",
+    "attachMany": "attachments",
+    "submit": "Submit enquiry",
+    "successMsg": "Thanks — your enquiry has been submitted. Our team will reply within 24 hours.",
+    "history": "Enquiry history",
+    "historySub": "Track the status of your past enquiries.",
+    "historyEmpty": "No enquiries yet. Submit one above and it'll appear here.",
+    "historyEmptyFilter": "No enquiries match this filter.",
+    "filterAll": "All",
+    "filterOpen": "Open",
+    "filterInProgress": "In progress",
+    "filterResolved": "Resolved",
+    "statusOpen": "Open",
+    "statusInProgress": "In progress",
+    "statusResolved": "Resolved"
+  },
+  "upgrade": {
+    "title": "Lower fees",
+    "desc": "Verify your business to unlock 30% lower transfer fees.",
+    "cta": "Verify now"
+  },
+  "user": {
+    "role": "Personal"
+  },
+  "page": {
+    "welcome": "Welcome back, Carlos",
+    "subtitle": "Here's how your transfers are performing this month."
+  },
+  "action": {
+    "addMoney": "Add Money",
+    "sendMoney": "Send Money"
+  },
+  "kpi": {
+    "balance": "Available balance",
+    "balanceSub": "USD wallet",
+    "walletCAD": "CAD wallet",
+    "walletEUR": "EUR wallet",
+    "walletGBP": "GBP wallet",
+    "sentMonth": "Sent this month",
+    "sentMonthDelta": "+12.4% vs last month"
+  },
+  "balance": {
+    "total": "Total balance · USD equivalent"
+  },
+  "chart": {
+    "title": "Remittance trend",
+    "subtitle": "Volume sent over time",
+    "legendSent": "Sent",
+    "legendReceived": "Received by family",
+    "sentSuffix": "sent",
+    "receivedSuffix": "received",
+    "monthsLong": {
+      "jan": "JANUARY",
+      "feb": "FEBRUARY",
+      "mar": "MARCH",
+      "apr": "APRIL",
+      "may": "MAY",
+      "jun": "JUNE",
+      "jul": "JULY",
+      "aug": "AUGUST",
+      "sep": "SEPTEMBER",
+      "oct": "OCTOBER",
+      "nov": "NOVEMBER",
+      "dec": "DECEMBER"
+    },
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "daysLong": {
+      "mon": "MONDAY",
+      "tue": "TUESDAY",
+      "wed": "WEDNESDAY",
+      "thu": "THURSDAY",
+      "fri": "FRIDAY",
+      "sat": "SATURDAY",
+      "sun": "SUNDAY"
+    },
+    "weeks": {
+      "w1": "W1",
+      "w2": "W2",
+      "w3": "W3",
+      "w4": "W4"
+    },
+    "weeksLong": {
+      "w1": "WEEK 1",
+      "w2": "WEEK 2",
+      "w3": "WEEK 3",
+      "w4": "WEEK 4"
+    },
+    "range": {
+      "7d": "7d",
+      "30d": "30d",
+      "3m": "3m",
+      "1y": "1y"
+    }
+  },
+  "checkExchangeRate": {
+    "title": "Check exchange rate"
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Feb",
+    "mar": "Mar",
+    "apr": "Apr",
+    "may": "May",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aug",
+    "sep": "Sep",
+    "oct": "Oct",
+    "nov": "Nov",
+    "dec": "Dec"
+  },
+  "activity": {
+    "title": "Recent activity",
+    "viewAll": "View all transfers →",
+    "th": {
+      "recipient": "Recipient",
+      "sent": "Sent",
+      "received": "Received",
+      "fee": "Fee",
+      "status": "Status",
+      "date": "Date"
+    },
+    "method": {
+      "bank": "Bank",
+      "cashPickup": "Cash pickup"
+    },
+    "time": {
+      "justNow": "Just now"
+    }
+  },
+  "country": {
+    "india": "India",
+    "philippines": "Philippines",
+    "mexico": "Mexico",
+    "nigeria": "Nigeria",
+    "bangladesh": "Bangladesh",
+    "colombia": "Colombia"
+  },
+  "relation": {
+    "mother": "Mother",
+    "father": "Father",
+    "brother": "Brother",
+    "sister": "Sister",
+    "cousin": "Cousin",
+    "friend": "Friend",
+    "spouse": "Spouse",
+    "other": "Family"
+  },
+  "accountPicker": {
+    "title": "Choose an account",
+    "sub": "Pick which account you'd like to send to.",
+    "close": "Close"
+  },
+  "status": {
+    "arrived": "Arrived",
+    "onTheWay": "On the way",
+    "actionNeeded": "Action needed"
+  },
+  "quickSend": {
+    "title": "Quick send",
+    "feeLabel": "Fee",
+    "cta": "Continue →"
+  },
+  "inflight": {
+    "title": "On the way",
+    "count": "1 transfer",
+    "via": "via",
+    "stepSent": "Sent",
+    "stepConverting": "Converting",
+    "stepArrived": "Arrived",
+    "etaPrefix": "Arrives in",
+    "etaValue": "~3 min"
+  },
+  "fx": {
+    "title": "Live rates",
+    "viewAll": "All rates →",
+    "flat": "— flat"
+  },
+  "recipients": {
+    "title": "Saved recipients",
+    "manage": "Manage →",
+    "sentLabel": "Sent",
+    "pageTitle": "Recipients",
+    "pageSub": "People you send money to. Add, edit, or remove anyone here.",
+    "addBtn": "Add recipient",
+    "searchPlaceholder": "Search by name or destination",
+    "filterAll": "All",
+    "resultsCount": "{count} recipients",
+    "resultsCountOne": "1 recipient",
+    "resultsCountZero": "No recipients",
+    "type": {
+      "bank": "Bank",
+      "mobile": "Mobile wallet",
+      "cash": "Cash pickup"
+    },
+    "th": {
+      "name": "Recipient",
+      "destination": "Destination",
+      "country": "Country",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "empty": {
+      "title": "No recipients yet",
+      "sub": "Add your first recipient to start sending money.",
+      "cta": "Add recipient"
+    },
+    "modal": {
+      "addTitle": "Add new recipient",
+      "editTitle": "Edit recipient",
+      "deleteTitle": "Delete recipient",
+      "deleteConfirm": "Are you sure you want to delete {name}? This can't be undone.",
+      "deleteAction": "Delete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "chooseType": "How will they receive money?",
+      "changeType": "Change type",
+      "typeBank": "Bank account",
+      "typeBankSub": "Direct deposit to a bank account",
+      "typeMobile": "Mobile wallet",
+      "typeMobileSub": "GCash, bKash, M-Pesa and more",
+      "typeCash": "Cash pickup",
+      "typeCashSub": "MoneyGram, Western Union, Ria",
+      "name": "Recipient name",
+      "namePlaceholder": "Full name",
+      "country": "Country",
+      "chooseCountry": "Choose country",
+      "bankName": "Bank name",
+      "bankNamePlaceholder": "e.g. HDFC Bank",
+      "accountNumber": "Account number / IBAN",
+      "accountNumberPlaceholder": "Account or IBAN",
+      "walletProvider": "Wallet provider",
+      "walletProviderPlaceholder": "e.g. GCash, bKash",
+      "phone": "Phone number",
+      "phonePlaceholder": "01XXXXXXXXX",
+      "pickupProvider": "Pickup provider",
+      "pickupProviderPlaceholder": "e.g. MoneyGram",
+      "city": "City",
+      "cityPlaceholder": "e.g. Lagos"
+    }
+  },
+  "txHistory": {
+    "title": "Transaction history",
+    "sub": "All your transfers, top-ups, and receipts in one place.",
+    "filterType": "Type",
+    "filterStatus": "Status",
+    "filterDate": "Date range",
+    "searchPlaceholder": "Search by name or reference",
+    "resultsCount": "{count} transactions",
+    "resultsCountOne": "1 transaction",
+    "resultsCountZero": "No transactions",
+    "type": {
+      "all": "All",
+      "send": "Sent",
+      "add": "Added",
+      "received": "Received"
+    },
+    "status": {
+      "all": "All",
+      "success": "Success",
+      "pending": "Pending",
+      "failed": "Failed"
+    },
+    "th": {
+      "type": "Type",
+      "detail": "Detail",
+      "amount": "Amount",
+      "status": "Status",
+      "date": "Date"
+    },
+    "row": {
+      "sentTo": "Sent to {name}",
+      "addedFrom": "Added from {source}",
+      "receivedFrom": "Received from {source}"
+    },
+    "empty": {
+      "title": "No transactions found",
+      "sub": "Try adjusting your filters or search term."
+    },
+    "detail": {
+      "title": "Transaction details",
+      "type": "Type",
+      "status": "Status",
+      "date": "Date",
+      "reference": "Reference",
+      "method": "Method",
+      "recipient": "Recipient",
+      "source": "Source",
+      "country": "Country",
+      "youSent": "You sent",
+      "theyGot": "They received",
+      "youAdded": "You added",
+      "youReceived": "You received",
+      "fee": "Fee",
+      "total": "Total",
+      "rate": "Exchange rate",
+      "close": "Close",
+      "share": "Share",
+      "download": "Download",
+      "shareTitle": "RemitPay receipt",
+      "shareTextTpl": "{type} · {amount} · Ref {ref}",
+      "receiptHeader": "RemitPay — Transaction receipt",
+      "linkCopied": "Link copied"
+    }
+  },
+  "addMoney": {
+    "stepper": {
+      "method": "Method",
+      "amount": "Amount",
+      "payment": "Payment",
+      "done": "Done"
+    },
+    "s1": {
+      "title": "Add money to your wallet",
+      "sub": "Choose how you'd like to pay. You can change this anytime."
+    },
+    "method": {
+      "recommended": "Recommended",
+      "card": {
+        "name": "Debit or credit card",
+        "meta": "Instant · 2.9% + $0.30 fee",
+        "summaryMeta": "Instant · 2.9% + $0.30",
+        "chipName": "Debit or credit card"
+      },
+      "bank": {
+        "name": "Bank transfer",
+        "meta": "Free · Sometimes takes 1–3 days · Highest limits",
+        "summaryMeta": "Free · 1–3 business days",
+        "chipName": "Bank account"
+      },
+      "bkash": {
+        "name": "Mobile financial service",
+        "meta": "Instant · 1.8% fee · No bank account needed",
+        "summaryMeta": "Instant · 1.8% fee",
+        "chipName": "bKash",
+        "shortName": "bKash"
+      }
+    },
+    "s2": {
+      "title": "How much do you want to add?",
+      "sub": "Enter an amount or pick a quick option below.",
+      "youAdd": "You add",
+      "min": "Minimum $5",
+      "max": "Maximum {amount} with this method",
+      "minError": "Add at least $5 to continue",
+      "overLimit": "Over the {amount} limit",
+      "statementPrefix": "This will appear on your statement as",
+      "statementBrand": "REMITTANCE PAY"
+    },
+    "s3": {
+      "cardTitle": "Card details",
+      "cardSub": "Your card is encrypted and never stored on our servers.",
+      "bankTitle": "Connect your bank",
+      "bankSub": "We use your bank's secure login. We never see your password.",
+      "bkashTitle": "Pay with bKash",
+      "bkashSub": "Enter your bKash phone number to continue.",
+      "cardNum": "Card number",
+      "expiry": "Expiry",
+      "cvc": "CVC",
+      "cardName": "Cardholder name",
+      "postal": "Postal code",
+      "saveCard": "Save this card for next time",
+      "encrypted": "Encrypted with 256-bit SSL · We never store your card number",
+      "poweredBy": "Powered by",
+      "bankConnectTitle": "Connect your bank securely",
+      "bankConnectSub": "We use your bank's secure login. We never see your password.",
+      "continueWith": "Continue with",
+      "noBank": "Don't see your bank?",
+      "manualTransfer": "Use manual transfer instead",
+      "bkashCardTitle": "Pay with bKash",
+      "bkashRedirect": "We'll redirect you to bKash to enter your PIN. Takes about 30 seconds.",
+      "bkashHelper": "bKash will show you the same amount you're adding.",
+      "namePlaceholder": "Name on card",
+      "zipPlaceholder": "12345"
+    },
+    "summary": {
+      "title": "Top-up summary",
+      "balance": "Balance:",
+      "totalCharged": "Total charged",
+      "trust": "Your payment is secure. We're licensed by FinCEN and protect funds up to $250,000."
+    },
+    "cta": {
+      "continueToMethod": "Continue to payment method",
+      "continueToPayment": "Continue to payment",
+      "addAtLeast5": "Add at least $5",
+      "enterAmount": "Enter an amount",
+      "payAmount": "Pay {amount}"
+    },
+    "processing": {
+      "cardTitle": "Confirming with your bank…",
+      "bankTitle": "Setting up your bank transfer…",
+      "bkashTitle": "Waiting for bKash confirmation…",
+      "sub": "This usually takes a few seconds. Don't refresh or close this tab."
+    },
+    "success": {
+      "titleTpl": "{amount} added to your wallet",
+      "youAdded": "You added",
+      "methodLabel": "Method",
+      "downloadReceipt": "Download receipt",
+      "sendMoney": "Send money",
+      "done": "Done — back to dashboard"
+    }
+  },
+  "sendMoney": {
+    "stepper": {
+      "recipient": "Recipient",
+      "amount": "Amount",
+      "review": "Review",
+      "send": "Send"
+    },
+    "s1": {
+      "title": "Who are you sending to?",
+      "sub": "Pick a saved recipient or add someone new.",
+      "searchPlaceholder": "Search by name or country",
+      "payMethod": "Payment option",
+      "frequent": "Frequent",
+      "allRecipients": "All recipients",
+      "addNew": "Add new recipient"
+    },
+    "s2": {
+      "title": "How much would you like to send?",
+      "sub": "Enter an amount in either currency. We update both as you type.",
+      "youSend": "You send",
+      "theyGet": "They get",
+      "deliverySpeed": "Delivery speed",
+      "standardName": "Standard",
+      "standardTime": "Arrives in ~1 hour",
+      "instantName": "Instant",
+      "instantTime": "Under 30 seconds",
+      "instantPrice": "+$1.99"
+    },
+    "s3": {
+      "title": "Review your transfer",
+      "sub": "Check the details below. You can edit any section before confirming.",
+      "recipientLabel": "Recipient",
+      "amountRateLabel": "Amount & rate",
+      "rateLocked": "Rate locked for",
+      "addNote": "Add a note (optional)",
+      "notePlaceholder": "A short message for your recipient",
+      "noteSuffix": "/50"
+    },
+    "summary": {
+      "title": "Transfer summary",
+      "pickRecipient": "Select a recipient to begin",
+      "theyGet": "They get",
+      "youSend": "You send",
+      "exchangeRate": "Exchange rate",
+      "fee": "Fee",
+      "total": "Total",
+      "trust": "Your money is safe. We're licensed by FinCEN and protect funds up to $250,000."
+    },
+    "cta": {
+      "pickFirst": "Pick a recipient first",
+      "continue": "Continue",
+      "enterAmount": "Enter an amount",
+      "continueToRecipient": "Continue to recipient",
+      "pickRecipient": "Pick a recipient",
+      "continueToReview": "Continue to review",
+      "confirmSend": "Confirm and send {amount}"
+    },
+    "auth": {
+      "title": "Confirm it's you",
+      "subTpl": "Sending {amount} to {name}",
+      "hint": "Enter your 6-digit PIN"
+    },
+    "processing": {
+      "titleTpl": "Sending to {name}…",
+      "sub": "This usually takes a few seconds"
+    },
+    "success": {
+      "titleTpl": "On the way to {name}",
+      "sub": "Arrives in ~3 min",
+      "youSent": "You sent",
+      "theyGet": "They get",
+      "share": "Share receipt",
+      "again": "Send again",
+      "done": "Done",
+      "copied": "Copied ✓",
+      "shareTitle": "Transfer receipt",
+      "shareTextTpl": "Reference {ref}"
+    },
+    "freqSent": "Sent"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"page-head\\\\\\\\|page-title\\\\\\\\|welcome\\\\\\\\|page-actions\\\\\\\\|page-sub\" \"c:/Users/BS00721/OneDrive - Brain Station 23 PLC/Design With Claude/RemitPay_Claude Code/dashboard-web.html\")",
+      "Bash(grep -n \"sendMoney\\\\\\\\.\\\\\\\\\\(s1\\\\\\\\|s2\\\\\\\\|stepper\\\\\\\\|cta\\\\\\\\|summary\\\\\\\\\\)\" \"c:/Users/BS00721/OneDrive - Brain Station 23 PLC/Design With Claude/RemitPay_Claude Code/locales/en.json\")",
+      "Bash(grep -v \":0$\")"
+    ]
+  }
+}

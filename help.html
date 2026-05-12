@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>/* auth guard — redirect before rendering if not signed in */(function(){var k='remitpay.auth';if(!(localStorage.getItem(k)||sessionStorage.getItem(k)))location.replace('login.html');})();</script>
+<title>Help & Support — RemitPay</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-primary: #00A86B;
+    --brand-primary-pressed: #008454;
+    --brand-secondary: #2F80ED;
+    --brand-accent: #00C474;
+    --success-base: #00A371;
+    --success-bg: #E6F7F1;
+    --warning-base: #E89B00;
+    --warning-bg: #FFF6E5;
+    --error-base: #D7263D;
+    --error-bg: #FCE8EB;
+    --text-primary: #0A2540;
+    --text-secondary: #6B8299;
+    --text-muted: #9AAEC1;
+    --text-inverse: #FFFFFF;
+    --surface-page: #F4F8FC;
+    --surface-card: #FFFFFF;
+    --surface-raised: #FAFCFE;
+    --border-subtle: #E5EDF5;
+    --border-strong: #C3D2E0;
+    --elev-1: 0 1px 2px rgba(10,37,64,0.06);
+    --elev-2: 0 4px 12px rgba(10,37,64,0.08);
+    --elev-3: 0 12px 32px rgba(10,37,64,0.14);
+    --ease-std: cubic-bezier(0.2, 0, 0, 1);
+    --dur-fast: 160ms;
+    --dur-base: 240ms;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Poppins', system-ui, sans-serif;
+    background: var(--surface-page);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  button, input, textarea { font-family: inherit; }
+  input, textarea { cursor: text; }
+  [hidden] { display: none !important; }
+
+  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    background: var(--surface-card);
+    border-right: 1px solid var(--border-subtle);
+    padding: 24px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px; padding: 4px 12px 24px;
+    text-decoration: none; color: inherit;
+    transition: opacity var(--dur-fast) var(--ease-std);
+  }
+  .logo:hover { opacity: 0.85; }
+  .logo:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 4px; border-radius: 4px; }
+  .logo-mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-family: 'Poppins'; font-weight: 800; font-size: 16px;
+  }
+  .logo-text { font-family: 'Poppins'; font-weight: 800; font-size: 18px; letter-spacing: -0.3px; }
+  .logo-text span { color: var(--brand-accent); }
+
+  .nav-section { margin-top: 8px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 8px;
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 14px; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-std);
+    cursor: pointer;
+  }
+  .nav-item:hover { background: var(--surface-page); color: var(--text-primary); }
+  .nav-item.active {
+    background: rgba(0,168,107,0.08); color: var(--brand-primary); font-weight: 600;
+  }
+  .nav-item .badge {
+    margin-left: auto; background: var(--brand-accent); color: #002a50;
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px;
+  }
+  .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
+  .upgrade-card {
+    background: linear-gradient(160deg, var(--brand-primary), var(--brand-primary-pressed));
+    border-radius: 12px; padding: 16px; color: #fff;
+  }
+  .upgrade-card h4 { font-family: 'Poppins'; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .upgrade-card p { font-size: 12px; opacity: 0.75; margin-bottom: 12px; line-height: 1.4; }
+  .upgrade-btn {
+    background: var(--brand-accent); color: var(--brand-primary-pressed);
+    border: none; padding: 8px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; width: 100%;
+    cursor: pointer;
+  }
+
+  /* ============ MAIN ============ */
+  .main { display: flex; flex-direction: column; min-width: 0; }
+  .topbar {
+    height: 64px; background: var(--surface-card);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 16px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-spacer { flex: 1; }
+  .topbar-actions { display: flex; align-items: center; gap: 8px; }
+  .ico-btn {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: transparent; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary); position: relative;
+    transition: background var(--dur-fast) var(--ease-std);
+  }
+  .ico-btn:hover { background: var(--surface-page); color: var(--text-primary); }
+  .ico-btn .dot {
+    position: absolute; top: 9px; right: 10px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--brand-accent); border: 2px solid #fff;
+  }
+  .user-menu {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 12px 6px 6px; border-radius: 999px;
+    background: var(--surface-page); border: none; cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-std);
+  }
+  .user-menu:hover { background: var(--border-subtle); }
+  .user-av {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #FFB347, #FF7043);
+    color: #fff; font-weight: 700; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .user-info { text-align: left; line-height: 1.2; }
+  .user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .user-role { font-size: 11px; color: var(--text-secondary); }
+  .user-chev { color: var(--text-secondary); }
+
+  /* ============ LANGUAGE SWITCHER ============ */
+  .lang-switcher { position: relative; }
+  .lang-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px; border-radius: 8px;
+    background: transparent; border: 1px solid var(--border-subtle);
+    color: var(--text-secondary); font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-std), border-color var(--dur-fast) var(--ease-std);
+  }
+  .lang-btn:hover { background: var(--surface-page); border-color: var(--border-strong); }
+  .lang-switcher.open .lang-btn { border-color: var(--brand-primary); color: var(--brand-primary); }
+  .lang-btn .chev { transition: transform var(--dur-fast) var(--ease-std); }
+  .lang-switcher.open .lang-btn .chev { transform: rotate(180deg); }
+  .lang-menu {
+    position: absolute; top: calc(100% + 6px); right: 0;
+    min-width: 180px; padding: 6px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px; box-shadow: var(--elev-3);
+    list-style: none; margin: 0; z-index: 30;
+    opacity: 0; transform: translateY(-4px); pointer-events: none;
+    transition: opacity var(--dur-fast) var(--ease-std), transform var(--dur-fast) var(--ease-std);
+  }
+  .lang-switcher.open .lang-menu { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .lang-menu li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text-primary);
+    cursor: pointer; -webkit-user-select: none; user-select: none;
+    transition: background var(--dur-fast) var(--ease-std);
+  }
+  .lang-menu li:hover { background: var(--surface-page); }
+  .lang-menu li.active { color: var(--brand-primary); font-weight: 600; }
+  .lang-menu .lang-code {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.4px;
+    background: var(--surface-page); color: var(--text-secondary);
+    padding: 3px 7px; border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .lang-menu li.active .lang-code { background: var(--brand-primary); color: #fff; }
+  .lang-menu .check {
+    margin-left: auto; opacity: 0; color: var(--brand-primary);
+    transition: opacity var(--dur-fast) var(--ease-std);
+  }
+  .lang-menu li.active .check { opacity: 1; }
+  html[lang="bn"] body { font-family: 'Noto Sans Bengali', 'Poppins', system-ui, sans-serif; }
+
+  /* ============ CONTENT ============ */
+  .content { padding: 32px; max-width: 1080px; width: 100%; }
+  .page-head { margin-bottom: 24px; }
+  .page-title {
+    font-family: 'Poppins'; font-size: 28px; font-weight: 800;
+    letter-spacing: -0.5px; line-height: 1.1; margin-bottom: 6px;
+  }
+  .page-sub { font-size: 14px; color: var(--text-secondary); max-width: 560px; }
+
+  /* ============ HELP CONTENT ============ */
+  .help-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .help-card-title {
+    font-family: 'Poppins'; font-size: 16px; font-weight: 700;
+    color: var(--text-primary); margin-bottom: 4px; letter-spacing: -0.2px;
+  }
+  .help-card-sub {
+    font-size: 13px; color: var(--text-secondary); margin-bottom: 18px;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .contact-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 16px; background: var(--surface-page);
+    border: 1px solid var(--border-subtle); border-radius: 12px;
+    text-decoration: none; color: inherit;
+    transition: border-color var(--dur-fast) var(--ease-std), background var(--dur-fast) var(--ease-std), transform var(--dur-fast) var(--ease-std);
+  }
+  a.contact-item:hover {
+    background: #fff; border-color: var(--brand-primary);
+    transform: translateY(-1px);
+  }
+  .contact-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,168,107,0.08); color: var(--brand-primary);
+    flex-shrink: 0;
+  }
+  .contact-body { min-width: 0; flex: 1; }
+  .contact-label {
+    font-size: 11px; font-weight: 700; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+  }
+  .contact-value {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    word-break: break-word;
+  }
+
+  /* ============ ENQUIRY FORM ============ */
+  .help-field { margin-bottom: 14px; }
+  .help-label {
+    display: block;
+    font-size: 12px; font-weight: 600; color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+  .help-input {
+    width: 100%; padding: 12px 14px;
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    font-size: 14px; font-weight: 500; color: var(--text-primary);
+    outline: none; font-family: inherit;
+    transition: border-color var(--dur-fast) var(--ease-std), background var(--dur-fast) var(--ease-std);
+  }
+  .help-input:focus { border-color: var(--brand-primary); background: #fff; }
+  .help-input.invalid { border-color: var(--error-base); background: #fff; }
+  .help-textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
+  .help-success {
+    background: var(--success-bg); color: var(--success-base);
+    border-radius: 8px; padding: 10px 12px;
+    font-size: 13px; font-weight: 500;
+    display: flex; align-items: flex-start; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .help-submit {
+    height: 46px; padding: 0 22px;
+    background: var(--brand-primary); color: #fff;
+    border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; box-shadow: var(--elev-1);
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background var(--dur-fast) var(--ease-std), box-shadow var(--dur-fast) var(--ease-std);
+  }
+  .help-submit:hover { background: var(--brand-primary-pressed); box-shadow: var(--elev-2); }
+  .help-submit:disabled { opacity: 0.7; cursor: wait; }
+
+  /* select chevron */
+  select.help-input {
+    -webkit-appearance: none; appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B8299' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat; background-position: right 14px center;
+    padding-right: 38px; cursor: pointer;
+  }
+
+  /* ============ ATTACHMENTS ============ */
+  .attach-zone {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; padding: 22px 16px;
+    background: var(--surface-page);
+    border: 2px dashed var(--border-strong);
+    border-radius: 10px; cursor: pointer;
+    transition: border-color var(--dur-fast) var(--ease-std), background var(--dur-fast) var(--ease-std);
+    text-align: center;
+  }
+  .attach-zone:hover { border-color: var(--brand-primary); background: #fff; }
+  .attach-zone svg { color: var(--text-secondary); }
+  .attach-zone-text { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .attach-zone-hint { font-size: 12px; color: var(--text-secondary); }
+  .attach-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .attach-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px; font-size: 13px;
+  }
+  .attach-item-icon { color: var(--text-secondary); flex-shrink: 0; }
+  .attach-item-name {
+    flex: 1; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-weight: 500; color: var(--text-primary);
+  }
+  .attach-item-size { color: var(--text-secondary); font-size: 12px; flex-shrink: 0; }
+  .attach-remove {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: transparent; border: none; cursor: pointer;
+    color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background var(--dur-fast) var(--ease-std), color var(--dur-fast) var(--ease-std);
+  }
+  .attach-remove:hover { background: var(--error-bg); color: var(--error-base); }
+
+  /* ============ ENQUIRY HISTORY ============ */
+  .hist-tabs { display: inline-flex; gap: 4px; padding: 3px; background: var(--surface-page); border-radius: 8px; margin-bottom: 14px; }
+  .hist-tab {
+    background: transparent; border: none; cursor: pointer;
+    padding: 6px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; color: var(--text-secondary);
+    transition: background var(--dur-fast) var(--ease-std), color var(--dur-fast) var(--ease-std);
+  }
+  .hist-tab:hover { color: var(--text-primary); }
+  .hist-tab.active { background: var(--surface-card); color: var(--brand-primary); box-shadow: var(--elev-1); }
+  .hist-list { display: flex; flex-direction: column; gap: 10px; }
+  .hist-item {
+    display: grid; grid-template-columns: auto 1fr auto;
+    gap: 12px; align-items: flex-start;
+    padding: 14px;
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    transition: border-color var(--dur-fast) var(--ease-std);
+  }
+  .hist-item:hover { border-color: var(--border-strong); }
+  .hist-cat-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .hist-cat-icon.transaction { background: rgba(0,168,107,0.10); color: var(--brand-primary); }
+  .hist-cat-icon.account { background: rgba(0,196,116,0.14); color: #0891B2; }
+  .hist-cat-icon.payment { background: rgba(0,163,113,0.12); color: var(--success-base); }
+  .hist-cat-icon.card { background: rgba(232,155,0,0.14); color: var(--warning-base); }
+  .hist-cat-icon.other { background: rgba(154,174,193,0.20); color: var(--text-secondary); }
+  .hist-body { min-width: 0; }
+  .hist-meta {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text-secondary);
+    margin-bottom: 4px;
+    text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;
+  }
+  .hist-cat { color: var(--brand-primary); }
+  .hist-meta .dot { color: var(--text-muted); font-weight: 700; }
+  .hist-subject {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    margin-bottom: 4px; line-height: 1.35;
+    word-break: break-word;
+  }
+  .hist-snippet {
+    font-size: 13px; color: var(--text-secondary);
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+  }
+  .hist-attach {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-top: 6px;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .hist-status {
+    font-size: 10px; font-weight: 700;
+    padding: 4px 10px; border-radius: 999px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    flex-shrink: 0; white-space: nowrap;
+  }
+  .hist-status.open { background: var(--warning-bg); color: var(--warning-base); }
+  .hist-status.in-progress { background: rgba(0,196,116,0.18); color: #006A85; }
+  .hist-status.resolved { background: var(--success-bg); color: var(--success-base); }
+  .hist-empty {
+    padding: 32px 16px; text-align: center;
+    color: var(--text-secondary);
+    background: var(--surface-page);
+    border: 1px dashed var(--border-strong);
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar {
+      position: fixed; top: 0; left: 0;
+      height: 100vh; width: 280px;
+      z-index: 50;
+      transform: translateX(-100%);
+      transition: transform 280ms var(--ease-std);
+      box-shadow: 4px 0 24px rgba(10,37,64,0.18);
+    }
+    body.sidebar-open .sidebar { transform: translateX(0); }
+    .topbar { padding: 0 16px; gap: 8px; }
+    .content { padding: 24px 16px; }
+    .topbar-actions { gap: 4px; }
+    .user-info { display: none; }
+    .user-menu { padding: 6px; }
+    .ico-btn { width: 38px; height: 38px; }
+    .lang-btn { padding: 8px 10px; }
+    .lang-btn svg:first-child { display: none; }
+  }
+  @media (max-width: 640px) {
+    .page-title { font-size: 22px; }
+    .help-card { padding: 18px; }
+    .lang-menu { right: -40px; }
+  }
+  @media (max-width: 420px) {
+    .topbar-actions .ico-btn { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <a class="logo" href="dashboard-web.html" aria-label="RemitPay — Dashboard">
+      <div class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><ellipse cx="12" cy="12" rx="4" ry="9"/></svg></div>
+      <div class="logo-text">Remit<span>Pay</span></div>
+    </a>
+    <div class="nav-section">
+      <a class="nav-item" href="dashboard-web.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        <span data-i18n="nav.dashboard">Dashboard</span>
+      </a>
+      <a class="nav-item" href="send-money-web.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span data-i18n="nav.sendMoney">Send Money</span>
+      </a>
+      <a class="nav-item" href="add-money-web.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span data-i18n="nav.addMoney">Add Money</span>
+      </a>
+      <a class="nav-item" href="recipients-web.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span data-i18n="nav.recipients">Recipients</span>
+      </a>
+      <a class="nav-item" href="transaction-history.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span data-i18n="nav.transactionHistory">Transaction history</span>
+      </a>
+      <a class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span data-i18n="nav.exchangeRates">Exchange Rates</span>
+      </a>
+      <a class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span data-i18n="nav.cards">Cards</span>
+      </a>
+      <a class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span data-i18n="nav.settings">Settings</span>
+      </a>
+      <a class="nav-item active" href="help.html" aria-current="page">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span data-i18n="nav.helpSupport">Help & Support</span>
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <div class="topbar">
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <div class="lang-switcher" id="langSwitcher">
+          <button class="lang-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Change language">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span data-lang-current>EN</span>
+            <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language">
+            <li role="option" data-lang="en" tabindex="0">
+              <span class="lang-code">EN</span>
+              <span data-i18n="lang.en">English</span>
+              <svg class="check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </li>
+            <li role="option" data-lang="bn" tabindex="0">
+              <span class="lang-code">BN</span>
+              <span data-i18n="lang.bn">বাংলা</span>
+              <svg class="check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </li>
+          </ul>
+        </div>
+        <button type="button" class="ico-btn" aria-label="Notifications">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="dot"></span>
+        </button>
+        <button type="button" class="user-menu" aria-label="User menu">
+          <div class="user-av">CR</div>
+          <div class="user-info">
+            <div class="user-name">Carlos R.</div>
+            <div class="user-role" data-i18n="user.role">Personal</div>
+          </div>
+          <svg class="user-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="page-head">
+        <h3 class="page-title" data-i18n="help.title">Help Center</h3>
+        <p class="page-sub" data-i18n="help.sub">We're here to help. Reach us through any channel below.</p>
+      </div>
+
+      <!-- Contact info -->
+      <section class="help-card">
+        <div class="help-card-title" data-i18n="help.contactInfo">Contact information</div>
+        <div class="help-card-sub" data-i18n="help.contactSub">Tap any card to reach our team directly.</div>
+        <div class="contact-grid">
+          <a class="contact-item" href="tel:+8801700000000">
+            <div class="contact-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div class="contact-body">
+              <div class="contact-label" data-i18n="help.phone">Phone</div>
+              <div class="contact-value">+880 1700 000 000</div>
+            </div>
+          </a>
+          <a class="contact-item" href="mailto:support@remitpay.com">
+            <div class="contact-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div class="contact-body">
+              <div class="contact-label" data-i18n="help.email">Email</div>
+              <div class="contact-value">support@remitpay.com</div>
+            </div>
+          </a>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="contact-body">
+              <div class="contact-label" data-i18n="help.hours">Support hours</div>
+              <div class="contact-value" data-i18n="help.hoursValue">24/7 — every day</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="contact-body">
+              <div class="contact-label" data-i18n="help.address">Office</div>
+              <div class="contact-value" data-i18n="help.addressValue">Dhaka, Bangladesh</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Enquiry form -->
+      <section class="help-card">
+        <div class="help-card-title" data-i18n="help.enquiry">Submit an enquiry</div>
+        <div class="help-card-sub" data-i18n="help.enquirySub">Describe your issue and our team will reply within 24 hours.</div>
+        <form id="helpEnquiryForm" novalidate>
+          <div class="help-field">
+            <label class="help-label" for="helpCategory" data-i18n="help.categoryLabel">Category</label>
+            <select class="help-input" id="helpCategory" required>
+              <option value="" disabled selected data-i18n="help.categoryPlaceholder">Choose a category</option>
+              <option value="transaction" data-i18n="help.catTransaction">Transaction issue</option>
+              <option value="account" data-i18n="help.catAccount">Account issue</option>
+              <option value="payment" data-i18n="help.catPayment">Payment issue</option>
+              <option value="card" data-i18n="help.catCard">Card issue</option>
+              <option value="other" data-i18n="help.catOther">Other</option>
+            </select>
+          </div>
+          <div class="help-field">
+            <label class="help-label" for="helpSubject" data-i18n="help.subjectLabel">Subject</label>
+            <input class="help-input" type="text" id="helpSubject" required data-i18n-placeholder="help.subjectPlaceholder" placeholder="Brief topic">
+          </div>
+          <div class="help-field">
+            <label class="help-label" for="helpMessage" data-i18n="help.messageLabel">Describe your issue</label>
+            <textarea class="help-input help-textarea" id="helpMessage" rows="5" required data-i18n-placeholder="help.messagePlaceholder" placeholder="Tell us what's going on…"></textarea>
+          </div>
+          <div class="help-field">
+            <label class="help-label" data-i18n="help.attachLabel">Attachments</label>
+            <label class="attach-zone" for="helpAttach">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              <span class="attach-zone-text" data-i18n="help.attachZone">Click to attach files (screenshots, PDFs, etc.)</span>
+              <span class="attach-zone-hint" data-i18n="help.attachHint">Up to 5 files, 10 MB each</span>
+              <input id="helpAttach" type="file" multiple accept="image/*,.pdf,.doc,.docx,.txt" hidden>
+            </label>
+            <div class="attach-list" id="helpAttachList"></div>
+          </div>
+          <div class="help-success" id="helpSuccess" hidden>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span data-i18n="help.successMsg">Thanks — your enquiry has been submitted. Our team will reply within 24 hours.</span>
+          </div>
+          <button type="submit" class="help-submit" id="helpSubmitBtn">
+            <span data-i18n="help.submit">Submit enquiry</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </form>
+      </section>
+
+      <!-- Enquiry history -->
+      <section class="help-card">
+        <div class="help-card-title" data-i18n="help.history">Enquiry history</div>
+        <div class="help-card-sub" data-i18n="help.historySub">Track the status of your past enquiries.</div>
+        <div class="hist-tabs" role="tablist" aria-label="Filter enquiries">
+          <button type="button" class="hist-tab active" role="tab" data-filter="all" data-i18n="help.filterAll">All</button>
+          <button type="button" class="hist-tab" role="tab" data-filter="open" data-i18n="help.filterOpen">Open</button>
+          <button type="button" class="hist-tab" role="tab" data-filter="in-progress" data-i18n="help.filterInProgress">In progress</button>
+          <button type="button" class="hist-tab" role="tab" data-filter="resolved" data-i18n="help.filterResolved">Resolved</button>
+        </div>
+        <div class="hist-list" id="helpHistList"></div>
+        <div class="hist-empty" id="helpHistEmpty" hidden data-i18n="help.historyEmpty">No enquiries yet. Submit one above and it'll appear here.</div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script src="locales/i18n.js"></script>
+<script src="auth.js"></script>
+<script>
+  (function () {
+    const t = (k) => (window.i18n ? window.i18n.t(k) : k);
+
+    const STORAGE_KEY = 'remitpay.enquiries';
+    const MAX_FILES = 5;
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
+    const form = document.getElementById('helpEnquiryForm');
+    const categoryEl = document.getElementById('helpCategory');
+    const subjectEl = document.getElementById('helpSubject');
+    const messageEl = document.getElementById('helpMessage');
+    const attachEl = document.getElementById('helpAttach');
+    const attachListEl = document.getElementById('helpAttachList');
+    const successEl = document.getElementById('helpSuccess');
+    const submitBtn = document.getElementById('helpSubmitBtn');
+    const histListEl = document.getElementById('helpHistList');
+    const histEmptyEl = document.getElementById('helpHistEmpty');
+    const histTabs = document.querySelectorAll('.hist-tab');
+
+    let pendingAttachments = []; // [{ name, size }]
+    let activeFilter = 'all';
+
+    // ---------- Storage ----------
+    function loadEnquiries() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (_) { /* ignore */ }
+      return null;
+    }
+    function saveEnquiries(list) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } catch (_) {}
+    }
+    function seedIfEmpty() {
+      if (loadEnquiries()) return;
+      const now = Date.now();
+      const day = 24 * 60 * 60 * 1000;
+      const seed = [
+        {
+          id: 'seed-1',
+          category: 'transaction',
+          subject: 'Transfer to Bangladesh stuck in processing',
+          message: 'I sent $250 to my recipient in Dhaka two days ago and it still shows as "Processing". Could you check the status?',
+          attachments: [{ name: 'receipt-screenshot.png', size: 184320 }],
+          status: 'in-progress',
+          createdAt: now - 2 * day
+        },
+        {
+          id: 'seed-2',
+          category: 'account',
+          subject: 'KYC verification pending review',
+          message: 'I uploaded my ID and proof of address but my account is still on the basic tier. Can you escalate the review?',
+          attachments: [],
+          status: 'resolved',
+          createdAt: now - 7 * day
+        },
+        {
+          id: 'seed-3',
+          category: 'payment',
+          subject: 'Card declined when adding funds',
+          message: 'My Visa card keeps getting declined when I try to add money, but the same card works fine elsewhere.',
+          attachments: [{ name: 'error.jpg', size: 92160 }, { name: 'card-statement.pdf', size: 412600 }],
+          status: 'resolved',
+          createdAt: now - 21 * day
+        }
+      ];
+      saveEnquiries(seed);
+    }
+
+    // ---------- Helpers ----------
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+    function formatDate(ts) {
+      const d = new Date(ts);
+      const lang = (document.documentElement.lang === 'bn') ? 'bn-BD' : 'en-US';
+      return d.toLocaleDateString(lang, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+    const CATEGORY_ICONS = {
+      transaction: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
+      account: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+      payment: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+      card: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+      other: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+    };
+    function categoryLabel(cat) {
+      const map = { transaction: 'help.catTransaction', account: 'help.catAccount', payment: 'help.catPayment', card: 'help.catCard', other: 'help.catOther' };
+      return t(map[cat] || 'help.catOther');
+    }
+    function statusLabel(status) {
+      const map = { 'open': 'help.statusOpen', 'in-progress': 'help.statusInProgress', 'resolved': 'help.statusResolved' };
+      return t(map[status] || 'help.statusOpen');
+    }
+
+    // ---------- Attachments ----------
+    function renderAttachments() {
+      attachListEl.innerHTML = pendingAttachments.map((f, idx) => `
+        <div class="attach-item">
+          <svg class="attach-item-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          <span class="attach-item-name">${escapeHtml(f.name)}</span>
+          <span class="attach-item-size">${formatSize(f.size)}</span>
+          <button type="button" class="attach-remove" data-idx="${idx}" aria-label="${escapeHtml(t('help.attachRemove'))}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    attachEl.addEventListener('change', () => {
+      const incoming = Array.from(attachEl.files || []);
+      for (const f of incoming) {
+        if (pendingAttachments.length >= MAX_FILES) break;
+        if (f.size > MAX_FILE_SIZE) continue;
+        // dedupe by name+size
+        if (pendingAttachments.some(a => a.name === f.name && a.size === f.size)) continue;
+        pendingAttachments.push({ name: f.name, size: f.size });
+      }
+      attachEl.value = ''; // reset so same file can be re-added later
+      renderAttachments();
+    });
+
+    attachListEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.attach-remove');
+      if (!btn) return;
+      const idx = Number(btn.dataset.idx);
+      pendingAttachments.splice(idx, 1);
+      renderAttachments();
+    });
+
+    // ---------- History rendering ----------
+    function renderHistory() {
+      const all = loadEnquiries() || [];
+      const filtered = activeFilter === 'all' ? all : all.filter(e => e.status === activeFilter);
+      const sorted = filtered.slice().sort((a, b) => b.createdAt - a.createdAt);
+
+      if (sorted.length === 0) {
+        histListEl.innerHTML = '';
+        histEmptyEl.hidden = false;
+        if (activeFilter !== 'all' && all.length > 0) {
+          histEmptyEl.textContent = t('help.historyEmptyFilter');
+        } else {
+          histEmptyEl.textContent = t('help.historyEmpty');
+        }
+        return;
+      }
+      histEmptyEl.hidden = true;
+      histListEl.innerHTML = sorted.map(e => {
+        const cat = e.category || 'other';
+        const icon = CATEGORY_ICONS[cat] || CATEGORY_ICONS.other;
+        const attachCount = (e.attachments || []).length;
+        return `
+          <article class="hist-item">
+            <div class="hist-cat-icon ${cat}">${icon}</div>
+            <div class="hist-body">
+              <div class="hist-meta">
+                <span class="hist-cat">${escapeHtml(categoryLabel(cat))}</span>
+                <span class="dot">·</span>
+                <span class="hist-date">${escapeHtml(formatDate(e.createdAt))}</span>
+              </div>
+              <div class="hist-subject">${escapeHtml(e.subject)}</div>
+              <div class="hist-snippet">${escapeHtml(e.message)}</div>
+              ${attachCount > 0 ? `
+                <div class="hist-attach">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                  <span>${attachCount} ${attachCount === 1 ? t('help.attachOne') : t('help.attachMany')}</span>
+                </div>
+              ` : ''}
+            </div>
+            <span class="hist-status ${e.status}">${escapeHtml(statusLabel(e.status))}</span>
+          </article>
+        `;
+      }).join('');
+    }
+
+    histTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        histTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeFilter = tab.dataset.filter;
+        renderHistory();
+      });
+    });
+
+    document.addEventListener('languagechange', renderHistory);
+
+    // ---------- Form submission ----------
+    function clearInvalid() {
+      categoryEl.classList.remove('invalid');
+      subjectEl.classList.remove('invalid');
+      messageEl.classList.remove('invalid');
+    }
+    categoryEl.addEventListener('change', clearInvalid);
+    subjectEl.addEventListener('input', clearInvalid);
+    messageEl.addEventListener('input', clearInvalid);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearInvalid();
+      successEl.hidden = true;
+
+      const category = categoryEl.value;
+      const subject = subjectEl.value.trim();
+      const message = messageEl.value.trim();
+      if (!category) { categoryEl.classList.add('invalid'); categoryEl.focus(); return; }
+      if (!subject) { subjectEl.classList.add('invalid'); subjectEl.focus(); return; }
+      if (!message) { messageEl.classList.add('invalid'); messageEl.focus(); return; }
+
+      submitBtn.disabled = true;
+      setTimeout(() => {
+        const list = loadEnquiries() || [];
+        list.push({
+          id: 'enq-' + Date.now(),
+          category,
+          subject,
+          message,
+          attachments: pendingAttachments.slice(),
+          status: 'open',
+          createdAt: Date.now()
+        });
+        saveEnquiries(list);
+
+        successEl.hidden = false;
+        categoryEl.value = '';
+        subjectEl.value = '';
+        messageEl.value = '';
+        pendingAttachments = [];
+        renderAttachments();
+        renderHistory();
+        submitBtn.disabled = false;
+        successEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 300);
+    });
+
+    // ---------- Init ----------
+    seedIfEmpty();
+    renderHistory();
+  })();
+</script>
+
+</body>
+</html>
