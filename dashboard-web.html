@@ -266,13 +266,20 @@
   .btn-primary:hover { background: var(--brand-primary-pressed); box-shadow: var(--elev-2); }
 
   /* ============ TOTAL BALANCE SUMMARY ============ */
-  /* Reuses the .kpi + .kpi-wallet styling so the card matches the wallet cards.
-     Width capped so the card sits at roughly the same width as one wallet card. */
-  .balance-summary {
-    display: block;
-    width: 100%;
-    max-width: 260px;
+  /* Reuses the .kpi + .kpi-wallet styling so the card matches a wallet card.
+     The row uses auto-fill (not auto-fit) so the single balance card occupies
+     exactly one column of the same grid the wallets below use — matching width. */
+  .balance-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
     margin-bottom: 16px;
+  }
+  .balance-summary {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 153px;
   }
 
   /* ============ KPI ROW ============ */
@@ -792,9 +799,11 @@
       </div>
 
       <!-- Total balance (USD equivalent) -->
-      <div class="kpi kpi-wallet balance-summary">
-        <div class="kpi-value">$5,076.10</div>
-        <span class="kpi-delta delta-flat" data-i18n="balance.total">Total balance · USD equivalent</span>
+      <div class="balance-row">
+        <div class="kpi kpi-wallet balance-summary">
+          <div class="kpi-value">$5,076.10</div>
+          <span class="kpi-delta delta-flat" data-i18n="balance.total">Total balance · USD equivalent</span>
+        </div>
       </div>
 
       <!-- KPI Row -->
