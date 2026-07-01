@@ -1,0 +1,14 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MuktoPay">
+  <path d="M6 8C6 5.8 8.3 4.4 10.3 5.4C20.6 10.6 30.2 17.8 34.6 21.8C36.4 23.4 35.9 26.3 33.7 27.2C25.4 30.6 15.6 33.7 8.4 35.4C6.4 35.9 4.5 34.3 4.7 32.2C5.6 24.6 6 15.6 6 8Z" fill="url(#mp-purple)"/>
+  <path d="M9 20C9 18.3 10.8 17.2 12.3 18C18 21 23.2 24.8 26.3 27.4C27.6 28.5 27.2 30.6 25.6 31.2C20.4 33.2 14.6 35 10.2 36C8.7 36.3 7.4 35.1 7.5 33.6C8.1 29.2 9 24.3 9 20Z" fill="url(#mp-gold)"/>
+  <defs>
+    <linearGradient id="mp-purple" x1="6" y1="5" x2="35" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#602C97"/>
+      <stop offset="1" stop-color="#3E0778"/>
+    </linearGradient>
+    <linearGradient id="mp-gold" x1="9" y1="18" x2="27" y2="36" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FABE36"/>
+      <stop offset="1" stop-color="#F9AE04"/>
+    </linearGradient>
+  </defs>
+</svg>
